@@ -1,0 +1,144 @@
+{
+  "dataVersion": "1",
+  "note": "Nominal maximum reaches for planning only. The cabling standard in force, the installed cabling certification and the transceiver/cable datasheets govern. Verify before procurement.",
+  "speeds": ["100M", "1G", "2.5G", "5G", "10G", "25G", "40G", "100G"],
+  "channelModel": {
+    "copperChannelMaxM": 100,
+    "copperPermanentLinkMaxM": 90,
+    "copperCordsTotalMaxM": 10,
+    "source": "ANSI/TIA-568.0-D and ISO/IEC 11801-1 horizontal channel model (90 m permanent link + 10 m of cords)"
+  },
+  "media": {
+    "cat5e": {
+      "family": "copper",
+      "label": "Category 5e twisted pair",
+      "reach": {
+        "100M": { "maxM": 100, "source": "IEEE 802.3 Clause 25 (100BASE-TX); TIA-568.2-D channel" },
+        "1G": { "maxM": 100, "source": "IEEE 802.3 Clause 40 (1000BASE-T); TIA-568.2-D channel" },
+        "2.5G": { "maxM": 100, "source": "IEEE 802.3 Clause 126 (2.5GBASE-T)" }
+      }
+    },
+    "cat6": {
+      "family": "copper",
+      "label": "Category 6 twisted pair",
+      "reach": {
+        "100M": { "maxM": 100, "source": "IEEE 802.3 Clause 25 (100BASE-TX)" },
+        "1G": { "maxM": 100, "source": "IEEE 802.3 Clause 40 (1000BASE-T)" },
+        "2.5G": { "maxM": 100, "source": "IEEE 802.3 Clause 126 (2.5GBASE-T)" },
+        "5G": { "maxM": 100, "source": "IEEE 802.3 Clause 126 (5GBASE-T)" },
+        "10G": { "maxM": 55, "source": "IEEE 802.3 Clause 55 (10GBASE-T) on Category 6: up to 55 m, subject to alien crosstalk mitigation (TIA TSB-155)" }
+      }
+    },
+    "cat6a": {
+      "family": "copper",
+      "label": "Category 6A twisted pair",
+      "reach": {
+        "100M": { "maxM": 100, "source": "IEEE 802.3 Clause 25 (100BASE-TX)" },
+        "1G": { "maxM": 100, "source": "IEEE 802.3 Clause 40 (1000BASE-T)" },
+        "2.5G": { "maxM": 100, "source": "IEEE 802.3 Clause 126 (2.5GBASE-T)" },
+        "5G": { "maxM": 100, "source": "IEEE 802.3 Clause 126 (5GBASE-T)" },
+        "10G": { "maxM": 100, "source": "IEEE 802.3 Clause 55 (10GBASE-T); TIA-568.2-D Category 6A" }
+      }
+    },
+    "cat8": {
+      "family": "copper",
+      "label": "Category 8 twisted pair",
+      "reach": {
+        "100M": { "maxM": 30, "source": "TIA-568.2-D Category 8 channel is specified to 30 m" },
+        "1G": { "maxM": 30, "source": "TIA-568.2-D Category 8 channel is specified to 30 m" },
+        "2.5G": { "maxM": 30, "source": "TIA-568.2-D Category 8 channel is specified to 30 m" },
+        "5G": { "maxM": 30, "source": "TIA-568.2-D Category 8 channel is specified to 30 m" },
+        "10G": { "maxM": 30, "source": "TIA-568.2-D Category 8 channel is specified to 30 m" },
+        "25G": { "maxM": 30, "source": "IEEE 802.3 Clause 113 (25GBASE-T)" },
+        "40G": { "maxM": 30, "source": "IEEE 802.3 Clause 113 (40GBASE-T)" }
+      }
+    },
+    "om1": {
+      "family": "fiber-mm",
+      "label": "OM1 multimode 62.5/125",
+      "reach": {
+        "1G": { "maxM": 275, "source": "IEEE 802.3 Clause 38 (1000BASE-SX, 200 MHz·km)" },
+        "10G": { "maxM": 33, "source": "IEEE 802.3 Clause 52 (10GBASE-SR)" }
+      }
+    },
+    "om2": {
+      "family": "fiber-mm",
+      "label": "OM2 multimode 50/125",
+      "reach": {
+        "1G": { "maxM": 550, "source": "IEEE 802.3 Clause 38 (1000BASE-SX)" },
+        "10G": { "maxM": 82, "source": "IEEE 802.3 Clause 52 (10GBASE-SR)" }
+      }
+    },
+    "om3": {
+      "family": "fiber-mm",
+      "label": "OM3 laser-optimized multimode 50/125",
+      "reach": {
+        "1G": { "maxM": 550, "source": "IEEE 802.3 Clause 38 (1000BASE-SX)" },
+        "10G": { "maxM": 300, "source": "IEEE 802.3 Clause 52 (10GBASE-SR)" },
+        "25G": { "maxM": 70, "source": "IEEE 802.3 Clause 112 (25GBASE-SR)" },
+        "40G": { "maxM": 100, "source": "IEEE 802.3 Clause 86 (40GBASE-SR4)" },
+        "100G": { "maxM": 70, "source": "IEEE 802.3 Clause 95 (100GBASE-SR4)" }
+      }
+    },
+    "om4": {
+      "family": "fiber-mm",
+      "label": "OM4 laser-optimized multimode 50/125",
+      "reach": {
+        "1G": { "maxM": 550, "source": "IEEE 802.3 Clause 38 (1000BASE-SX)" },
+        "10G": { "maxM": 400, "source": "IEEE 802.3 Clause 52 (10GBASE-SR, engineered link)" },
+        "25G": { "maxM": 100, "source": "IEEE 802.3 Clause 112 (25GBASE-SR)" },
+        "40G": { "maxM": 150, "source": "IEEE 802.3 Clause 86 (40GBASE-SR4)" },
+        "100G": { "maxM": 100, "source": "IEEE 802.3 Clause 95 (100GBASE-SR4)" }
+      }
+    },
+    "om5": {
+      "family": "fiber-mm",
+      "label": "OM5 wideband multimode 50/125",
+      "reach": {
+        "1G": { "maxM": 550, "source": "IEEE 802.3 Clause 38 (1000BASE-SX)" },
+        "10G": { "maxM": 400, "source": "IEEE 802.3 Clause 52 (10GBASE-SR, as OM4)" },
+        "25G": { "maxM": 100, "source": "IEEE 802.3 Clause 112 (25GBASE-SR, as OM4)" },
+        "40G": { "maxM": 150, "source": "IEEE 802.3 Clause 86 (40GBASE-SR4, as OM4)" },
+        "100G": { "maxM": 100, "source": "IEEE 802.3 Clause 95 (100GBASE-SR4, as OM4)" }
+      }
+    },
+    "os2": {
+      "family": "fiber-sm",
+      "label": "OS2 single-mode 9/125",
+      "reach": {
+        "1G": { "maxM": 5000, "source": "IEEE 802.3 Clause 38 (1000BASE-LX)" },
+        "10G": { "maxM": 10000, "source": "IEEE 802.3 Clause 52 (10GBASE-LR)" },
+        "25G": { "maxM": 10000, "source": "IEEE 802.3 Clause 114 (25GBASE-LR)" },
+        "40G": { "maxM": 10000, "source": "IEEE 802.3 Clause 87 (40GBASE-LR4)" },
+        "100G": { "maxM": 10000, "source": "IEEE 802.3 Clause 88 (100GBASE-LR4)" }
+      }
+    },
+    "dac": {
+      "family": "direct-attach",
+      "label": "Passive direct-attach copper (twinax)",
+      "reach": {
+        "1G": { "maxM": 5, "source": "Vendor-typical passive SFP DAC" },
+        "10G": { "maxM": 7, "source": "SFF-8431 passive SFP+ DAC, vendor-typical maximum 7 m" },
+        "25G": { "maxM": 5, "source": "IEEE 802.3 Clause 110 (25GBASE-CR, 5 m with RS-FEC; 3 m for CR-S)" },
+        "40G": { "maxM": 7, "source": "IEEE 802.3 Clause 85 (40GBASE-CR4)" },
+        "100G": { "maxM": 5, "source": "IEEE 802.3 Clause 92 (100GBASE-CR4)" }
+      }
+    },
+    "aoc": {
+      "family": "direct-attach",
+      "label": "Active optical cable",
+      "reach": {
+        "10G": { "maxM": 100, "source": "Vendor-typical; AOC reach is product-specific" },
+        "25G": { "maxM": 100, "source": "Vendor-typical; AOC reach is product-specific" },
+        "40G": { "maxM": 100, "source": "Vendor-typical; AOC reach is product-specific" },
+        "100G": { "maxM": 100, "source": "Vendor-typical; AOC reach is product-specific" }
+      }
+    }
+  },
+  "optics": {
+    "fiber-mm": { "1G": "1000BASE-SX", "10G": "10GBASE-SR", "25G": "25GBASE-SR", "40G": "40GBASE-SR4", "100G": "100GBASE-SR4" },
+    "fiber-sm": { "1G": "1000BASE-LX", "10G": "10GBASE-LR", "25G": "25GBASE-LR", "40G": "40GBASE-LR4", "100G": "100GBASE-LR4" },
+    "copper": { "1G": "1000BASE-T", "2.5G": "2.5GBASE-T", "5G": "5GBASE-T", "10G": "10GBASE-T" }
+  },
+  "parallelOptics": ["40GBASE-SR4", "100GBASE-SR4"]
+}

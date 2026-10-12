@@ -1,0 +1,235 @@
+{
+  "catalogVersion": "1",
+  "note": "Generic, vendor-neutral equipment templates for early design. Replace dimensions, weight and power with datasheet values before procurement. For network gear the type 'front' is the port side.",
+  "equipmentTypes": [
+    {
+      "id": "generic-patch-panel-24-rj45",
+      "manufacturer": "Generic",
+      "model": "24-port Cat6A patch panel 1U",
+      "category": "patch-panel",
+      "heightU": 1,
+      "fullDepth": false,
+      "depthMm": 120,
+      "weightKg": 1.5,
+      "airflow": "passive",
+      "ports": [{ "name": "{1-24}", "connector": "rj45", "rearConnector": "punchdown" }]
+    },
+    {
+      "id": "generic-patch-panel-48-rj45",
+      "manufacturer": "Generic",
+      "model": "48-port Cat6A patch panel 2U",
+      "category": "patch-panel",
+      "heightU": 2,
+      "fullDepth": false,
+      "depthMm": 120,
+      "weightKg": 3,
+      "airflow": "passive",
+      "ports": [{ "name": "{1-48}", "connector": "rj45", "rearConnector": "punchdown" }]
+    },
+    {
+      "id": "generic-fiber-panel-24-lc",
+      "manufacturer": "Generic",
+      "model": "24-port LC duplex fiber panel 1U",
+      "category": "patch-panel",
+      "heightU": 1,
+      "fullDepth": false,
+      "depthMm": 250,
+      "weightKg": 2,
+      "airflow": "passive",
+      "ports": [{ "name": "{1-24}", "connector": "lc-duplex" }]
+    },
+    {
+      "id": "generic-wall-outlet-2",
+      "manufacturer": "Generic",
+      "model": "2-port RJ45 faceplate",
+      "category": "outlet",
+      "heightU": 0,
+      "fullDepth": false,
+      "airflow": "passive",
+      "ports": [{ "name": "{1-2}", "connector": "rj45", "rearConnector": "punchdown" }]
+    },
+    {
+      "id": "generic-switch-48-1g-4sfpp",
+      "manufacturer": "Generic",
+      "model": "Access switch 48x1G RJ45 + 4x10G SFP+",
+      "category": "switch",
+      "heightU": 1,
+      "fullDepth": true,
+      "depthMm": 300,
+      "weightKg": 5,
+      "airflow": "side-to-side",
+      "power": { "typicalW": 60, "maxW": 150, "inlets": [{ "id": "PSU1", "connector": "C14" }, { "id": "PSU2", "connector": "C14" }] },
+      "ports": [
+        { "name": "Gi1/0/{1-48}", "connector": "rj45", "speed": "1G", "role": "data" },
+        { "name": "Te1/1/{1-4}", "connector": "sfp+", "speed": "10G", "role": "uplink" },
+        { "name": "mgmt0", "connector": "rj45", "speed": "1G", "role": "mgmt" },
+        { "name": "con0", "connector": "rj45", "role": "console" }
+      ]
+    },
+    {
+      "id": "generic-leaf-48-25g-6-100g",
+      "manufacturer": "Generic",
+      "model": "Leaf switch 48x25G SFP28 + 6x100G QSFP28",
+      "category": "switch",
+      "heightU": 1,
+      "fullDepth": true,
+      "depthMm": 450,
+      "weightKg": 9,
+      "airflow": "front-to-back",
+      "power": { "typicalW": 250, "maxW": 550, "inlets": [{ "id": "PSU1", "connector": "C14" }, { "id": "PSU2", "connector": "C14" }] },
+      "ports": [
+        { "name": "Eth1/{1-48}", "connector": "sfp28", "speed": "25G", "role": "data" },
+        { "name": "Eth1/{49-54}", "connector": "qsfp28", "speed": "100G", "role": "uplink" },
+        { "name": "mgmt0", "connector": "rj45", "speed": "1G", "role": "mgmt" },
+        { "name": "con0", "connector": "rj45", "role": "console" }
+      ]
+    },
+    {
+      "id": "generic-spine-32-100g",
+      "manufacturer": "Generic",
+      "model": "Spine switch 32x100G QSFP28",
+      "category": "switch",
+      "heightU": 1,
+      "fullDepth": true,
+      "depthMm": 500,
+      "weightKg": 10,
+      "airflow": "front-to-back",
+      "power": { "typicalW": 350, "maxW": 700, "inlets": [{ "id": "PSU1", "connector": "C14" }, { "id": "PSU2", "connector": "C14" }] },
+      "ports": [
+        { "name": "Eth1/{1-32}", "connector": "qsfp28", "speed": "100G", "role": "uplink" },
+        { "name": "mgmt0", "connector": "rj45", "speed": "1G", "role": "mgmt" },
+        { "name": "con0", "connector": "rj45", "role": "console" }
+      ]
+    },
+    {
+      "id": "generic-router-1u",
+      "manufacturer": "Generic",
+      "model": "Branch/edge router 1U",
+      "category": "router",
+      "heightU": 1,
+      "fullDepth": true,
+      "depthMm": 400,
+      "weightKg": 6,
+      "airflow": "front-to-back",
+      "power": { "typicalW": 80, "maxW": 250, "inlets": [{ "id": "PSU1", "connector": "C14" }, { "id": "PSU2", "connector": "C14" }] },
+      "ports": [
+        { "name": "Gi0/0/{0-3}", "connector": "rj45", "speed": "1G", "role": "data" },
+        { "name": "Te0/1/{0-1}", "connector": "sfp+", "speed": "10G", "role": "uplink" },
+        { "name": "mgmt0", "connector": "rj45", "speed": "1G", "role": "mgmt" },
+        { "name": "con0", "connector": "rj45", "role": "console" }
+      ]
+    },
+    {
+      "id": "generic-firewall-1u",
+      "manufacturer": "Generic",
+      "model": "Firewall 1U",
+      "category": "firewall",
+      "heightU": 1,
+      "fullDepth": true,
+      "depthMm": 450,
+      "weightKg": 7,
+      "airflow": "front-to-back",
+      "power": { "typicalW": 120, "maxW": 300, "inlets": [{ "id": "PSU1", "connector": "C14" }, { "id": "PSU2", "connector": "C14" }] },
+      "ports": [
+        { "name": "eth{1-8}", "connector": "rj45", "speed": "1G", "role": "data" },
+        { "name": "x{1-4}", "connector": "sfp+", "speed": "10G", "role": "uplink" },
+        { "name": "mgmt0", "connector": "rj45", "speed": "1G", "role": "mgmt" },
+        { "name": "con0", "connector": "rj45", "role": "console" }
+      ]
+    },
+    {
+      "id": "generic-server-1u",
+      "manufacturer": "Generic",
+      "model": "1U rack server, 2x25G + 2x1G + BMC",
+      "category": "server",
+      "heightU": 1,
+      "fullDepth": true,
+      "depthMm": 750,
+      "weightKg": 18,
+      "airflow": "front-to-back",
+      "power": { "typicalW": 300, "maxW": 750, "inlets": [{ "id": "PSU1", "connector": "C14" }, { "id": "PSU2", "connector": "C14" }] },
+      "ports": [
+        { "name": "nic{1-2}", "connector": "sfp28", "speed": "25G", "role": "data" },
+        { "name": "eno{1-2}", "connector": "rj45", "speed": "1G", "role": "data" },
+        { "name": "bmc", "connector": "rj45", "speed": "1G", "role": "mgmt" }
+      ]
+    },
+    {
+      "id": "generic-server-2u",
+      "manufacturer": "Generic",
+      "model": "2U rack server, 2x25G + 2x1G + BMC",
+      "category": "server",
+      "heightU": 2,
+      "fullDepth": true,
+      "depthMm": 750,
+      "weightKg": 28,
+      "airflow": "front-to-back",
+      "power": { "typicalW": 450, "maxW": 1100, "inlets": [{ "id": "PSU1", "connector": "C14" }, { "id": "PSU2", "connector": "C14" }] },
+      "ports": [
+        { "name": "nic{1-2}", "connector": "sfp28", "speed": "25G", "role": "data" },
+        { "name": "eno{1-2}", "connector": "rj45", "speed": "1G", "role": "data" },
+        { "name": "bmc", "connector": "rj45", "speed": "1G", "role": "mgmt" }
+      ]
+    },
+    {
+      "id": "generic-storage-2u",
+      "manufacturer": "Generic",
+      "model": "2U storage array, 4x25G + mgmt",
+      "category": "storage",
+      "heightU": 2,
+      "fullDepth": true,
+      "depthMm": 700,
+      "weightKg": 32,
+      "airflow": "front-to-back",
+      "power": { "typicalW": 500, "maxW": 900, "inlets": [{ "id": "PSU1", "connector": "C14" }, { "id": "PSU2", "connector": "C14" }] },
+      "ports": [
+        { "name": "ctl{1-4}", "connector": "sfp28", "speed": "25G", "role": "storage" },
+        { "name": "mgmt0", "connector": "rj45", "speed": "1G", "role": "mgmt" }
+      ]
+    },
+    {
+      "id": "generic-cable-manager-1u",
+      "manufacturer": "Generic",
+      "model": "Horizontal cable manager 1U",
+      "category": "cable-manager",
+      "heightU": 1,
+      "fullDepth": false,
+      "depthMm": 100,
+      "weightKg": 1,
+      "airflow": "passive"
+    },
+    {
+      "id": "generic-cable-manager-2u",
+      "manufacturer": "Generic",
+      "model": "Horizontal cable manager 2U",
+      "category": "cable-manager",
+      "heightU": 2,
+      "fullDepth": false,
+      "depthMm": 120,
+      "weightKg": 2,
+      "airflow": "passive"
+    },
+    {
+      "id": "generic-blanking-1u",
+      "manufacturer": "Generic",
+      "model": "Blanking panel 1U",
+      "category": "blanking",
+      "heightU": 1,
+      "fullDepth": false,
+      "depthMm": 10,
+      "weightKg": 0.3,
+      "airflow": "passive"
+    },
+    {
+      "id": "generic-shelf-2u",
+      "manufacturer": "Generic",
+      "model": "Cantilever shelf 2U",
+      "category": "shelf",
+      "heightU": 2,
+      "fullDepth": false,
+      "depthMm": 400,
+      "weightKg": 3,
+      "airflow": "passive"
+    }
+  ]
+}

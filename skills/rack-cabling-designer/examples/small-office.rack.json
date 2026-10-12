@@ -1,0 +1,62 @@
+{
+  "$schema": "../assets/schema/rack-model.schema.json",
+  "modelVersion": 1,
+  "meta": {
+    "name": "Small office comms cabinet",
+    "description": "24U network cabinet for one office floor: access switch, router, firewall and horizontal cabling to two work-area outlets.",
+    "site": "Example Co. - Floor 2",
+    "revision": "A",
+    "status": "design",
+    "author": "rack-cabling-designer example"
+  },
+  "policy": {
+    "powerDerating": 0.8,
+    "requireRedundantPower": true,
+    "labelPattern": "^C-\\d{3}$",
+    "colorByFunction": { "data": "blue", "uplink": "yellow", "mgmt": "grey", "horizontal": "white" }
+  },
+  "locations": [
+    { "id": "SITE", "kind": "site", "name": "Example Co." },
+    { "id": "IDF-2", "kind": "room", "name": "Floor 2 telecom room", "parent": "SITE" },
+    { "id": "WA-2", "kind": "work-area", "name": "Floor 2 open office", "parent": "SITE" }
+  ],
+  "racks": [
+    { "id": "R1", "name": "IDF2-R1", "location": "IDF-2", "heightU": 24, "widthIn": 19, "depthMm": 600, "posts": 4, "maxLoadKg": 400, "frontAisle": "none" }
+  ],
+  "devices": [
+    { "id": "pp1", "name": "PP-A", "type": "generic-patch-panel-24-rj45", "rack": "R1", "position": 22 },
+    { "id": "cm1", "name": "CM-1", "type": "generic-cable-manager-1u", "rack": "R1", "position": 21 },
+    { "id": "sw1", "name": "SW-ACC-01", "type": "generic-switch-48-1g-4sfpp", "rack": "R1", "position": 20, "role": "access" },
+    { "id": "cm2", "name": "CM-2", "type": "generic-cable-manager-1u", "rack": "R1", "position": 19 },
+    { "id": "rtr1", "name": "RTR-01", "type": "generic-router-1u", "rack": "R1", "position": 17, "role": "edge router" },
+    { "id": "fw1", "name": "FW-01", "type": "generic-firewall-1u", "rack": "R1", "position": 16, "role": "perimeter firewall" },
+    { "id": "wo1", "name": "WO-2-01", "type": "generic-wall-outlet-2", "location": "WA-2" },
+    { "id": "wo2", "name": "WO-2-02", "type": "generic-wall-outlet-2", "location": "WA-2" }
+  ],
+  "pdus": [
+    { "id": "pdu-a", "name": "PDU-A", "rack": "R1", "feed": "A", "circuit": "DB-2 / CB-07", "mounting": "0U-left", "voltage": 230, "maxAmps": 16, "phases": 1, "weightKg": 3, "outlets": [{ "connector": "C13", "count": 12 }] },
+    { "id": "pdu-b", "name": "PDU-B", "rack": "R1", "feed": "B", "circuit": "DB-2 / CB-08", "mounting": "0U-right", "voltage": 230, "maxAmps": 16, "phases": 1, "weightKg": 3, "outlets": [{ "connector": "C13", "count": 12 }] }
+  ],
+  "powerLinks": [
+    { "device": "sw1", "inlet": "PSU1", "pdu": "pdu-a", "outlet": 1 },
+    { "device": "sw1", "inlet": "PSU2", "pdu": "pdu-b", "outlet": 1 },
+    { "device": "rtr1", "inlet": "PSU1", "pdu": "pdu-a", "outlet": 2 },
+    { "device": "rtr1", "inlet": "PSU2", "pdu": "pdu-b", "outlet": 2 },
+    { "device": "fw1", "inlet": "PSU1", "pdu": "pdu-a", "outlet": 3 },
+    { "device": "fw1", "inlet": "PSU2", "pdu": "pdu-b", "outlet": 3 }
+  ],
+  "cables": [
+    { "id": "h1", "label": "C-001", "a": { "device": "pp1", "port": "1", "side": "rear" }, "b": { "device": "wo1", "port": "1", "side": "rear" }, "media": "cat6a", "lengthM": 35, "color": "white", "function": "horizontal", "pathway": "Ceiling tray T2" },
+    { "id": "h2", "label": "C-002", "a": { "device": "pp1", "port": "2", "side": "rear" }, "b": { "device": "wo1", "port": "2", "side": "rear" }, "media": "cat6a", "lengthM": 35, "color": "white", "function": "horizontal", "pathway": "Ceiling tray T2" },
+    { "id": "h3", "label": "C-003", "a": { "device": "pp1", "port": "3", "side": "rear" }, "b": { "device": "wo2", "port": "1", "side": "rear" }, "media": "cat6a", "lengthM": 42, "color": "white", "function": "horizontal", "pathway": "Ceiling tray T2" },
+    { "id": "h4", "label": "C-004", "a": { "device": "pp1", "port": "4", "side": "rear" }, "b": { "device": "wo2", "port": "2", "side": "rear" }, "media": "cat6a", "lengthM": 42, "color": "white", "function": "horizontal", "pathway": "Ceiling tray T2" },
+    { "id": "p1", "label": "C-011", "a": { "device": "sw1", "port": "Gi1/0/1" }, "b": { "device": "pp1", "port": "1" }, "media": "cat6a", "lengthM": 0.5, "color": "blue", "function": "data" },
+    { "id": "p2", "label": "C-012", "a": { "device": "sw1", "port": "Gi1/0/2" }, "b": { "device": "pp1", "port": "2" }, "media": "cat6a", "lengthM": 0.5, "color": "blue", "function": "data" },
+    { "id": "p3", "label": "C-013", "a": { "device": "sw1", "port": "Gi1/0/3" }, "b": { "device": "pp1", "port": "3" }, "media": "cat6a", "lengthM": 0.5, "color": "blue", "function": "data" },
+    { "id": "p4", "label": "C-014", "a": { "device": "sw1", "port": "Gi1/0/4" }, "b": { "device": "pp1", "port": "4" }, "media": "cat6a", "lengthM": 0.5, "color": "blue", "function": "data" },
+    { "id": "u1", "label": "C-021", "a": { "device": "sw1", "port": "Te1/1/1" }, "b": { "device": "rtr1", "port": "Te0/1/0" }, "media": "dac", "lengthM": 1, "color": "yellow", "function": "uplink" },
+    { "id": "u2", "label": "C-022", "a": { "device": "rtr1", "port": "Gi0/0/0" }, "b": { "device": "fw1", "port": "eth1" }, "media": "cat6a", "lengthM": 1, "color": "yellow", "function": "uplink" },
+    { "id": "m1", "label": "C-031", "a": { "device": "rtr1", "port": "mgmt0" }, "b": { "device": "sw1", "port": "Gi1/0/47" }, "media": "cat6a", "lengthM": 1, "color": "grey", "function": "mgmt" },
+    { "id": "m2", "label": "C-032", "a": { "device": "fw1", "port": "mgmt0" }, "b": { "device": "sw1", "port": "Gi1/0/48" }, "media": "cat6a", "lengthM": 1, "color": "grey", "function": "mgmt" }
+  ]
+}

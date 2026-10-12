@@ -1,0 +1,38 @@
+{
+  "$schema": "",
+  "modelVersion": 1,
+  "meta": {
+    "name": "New rack design",
+    "site": "Site name",
+    "revision": "A",
+    "status": "design"
+  },
+  "policy": {
+    "powerDerating": 0.8,
+    "powerBasis": "max",
+    "requireRedundantPower": true,
+    "labelPattern": "^[A-Z0-9]+-\\d{3,4}$"
+  },
+  "locations": [
+    { "id": "ROOM-1", "kind": "room", "name": "Telecom room" }
+  ],
+  "racks": [
+    { "id": "R01", "name": "R01", "location": "ROOM-1", "heightU": 42, "widthIn": 19, "depthMm": 1000, "posts": 4, "maxLoadKg": 1000, "frontAisle": "cold" }
+  ],
+  "devices": [
+    { "id": "pp1", "name": "R01-PP1", "type": "generic-patch-panel-24-rj45", "rack": "R01", "position": 42 },
+    { "id": "cm1", "name": "R01-CM1", "type": "generic-cable-manager-1u", "rack": "R01", "position": 41 },
+    { "id": "rtr1", "name": "R01-RTR1", "type": "generic-router-1u", "rack": "R01", "position": 40 }
+  ],
+  "pdus": [
+    { "id": "pdu-a", "rack": "R01", "feed": "A", "mounting": "0U-left", "voltage": 230, "maxAmps": 16, "phases": 1, "outlets": [{ "connector": "C13", "count": 20 }, { "connector": "C19", "count": 4 }] },
+    { "id": "pdu-b", "rack": "R01", "feed": "B", "mounting": "0U-right", "voltage": 230, "maxAmps": 16, "phases": 1, "outlets": [{ "connector": "C13", "count": 20 }, { "connector": "C19", "count": 4 }] }
+  ],
+  "powerLinks": [
+    { "device": "rtr1", "inlet": "PSU1", "pdu": "pdu-a", "outlet": 1 },
+    { "device": "rtr1", "inlet": "PSU2", "pdu": "pdu-b", "outlet": 1 }
+  ],
+  "cables": [
+    { "id": "c1", "label": "R01-001", "a": { "device": "rtr1", "port": "Gi0/0/0" }, "b": { "device": "pp1", "port": "1" }, "media": "cat6a", "lengthM": 1, "function": "uplink" }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "$schema": "../assets/schema/rack-model.schema.json",
+  "modelVersion": 1,
+  "meta": {
+    "name": "Data hall pod A",
+    "description": "Two 42U racks in a hot/cold aisle row: a compute rack with two port-side-exhaust leaf switches, four servers and a storage array, and a network rack with the spine. Leaf-to-spine runs over an OS2 trunk between LC panels.",
+    "site": "DC1 - Data hall 1, row A",
+    "revision": "1.0",
+    "status": "design",
+    "author": "rack-cabling-designer example"
+  },
+  "policy": {
+    "powerDerating": 0.8,
+    "powerBasis": "max",
+    "requireRedundantPower": true,
+    "labelPattern": "^DC1-\\d{4}$"
+  },
+  "locations": [
+    { "id": "DC1", "kind": "site", "name": "DC1" },
+    { "id": "DH1", "kind": "room", "name": "Data hall 1", "parent": "DC1" },
+    { "id": "ROW-A", "kind": "row", "name": "Row A", "parent": "DH1" }
+  ],
+  "racks": [
+    { "id": "A01", "name": "A01 compute", "location": "ROW-A", "heightU": 42, "widthIn": 19, "depthMm": 1200, "posts": 4, "maxLoadKg": 1000, "frontAisle": "cold" },
+    { "id": "A02", "name": "A02 network", "location": "ROW-A", "heightU": 42, "widthIn": 19, "depthMm": 1200, "posts": 4, "maxLoadKg": 1000, "frontAisle": "cold" }
+  ],
+  "equipmentTypes": [
+    {
+      "id": "leaf-48-25g-pse",
+      "manufacturer": "Generic",
+      "model": "Leaf 48x25G + 6x100G, port-side exhaust",
+      "category": "switch",
+      "heightU": 1,
+      "fullDepth": true,
+      "depthMm": 450,
+      "weightKg": 9,
+      "airflow": "back-to-front",
+      "power": { "typicalW": 250, "maxW": 550, "inlets": [{ "id": "PSU1", "connector": "C14" }, { "id": "PSU2", "connector": "C14" }] },
+      "ports": [
+        { "name": "Eth1/{1-48}", "connector": "sfp28", "speed": "25G", "role": "data" },
+        { "name": "Eth1/{49-54}", "connector": "qsfp28", "speed": "100G", "role": "uplink" },
+        { "name": "mgmt0", "connector": "rj45", "speed": "1G", "role": "mgmt" }
+      ],
+      "notes": "Ports face the rear of the rack (towards server NICs); the fans exhaust on the port side, so the PSU side breathes from the cold aisle."
+    }
+  ],
+  "devices": [
+    { "id": "leaf1", "name": "A01-LEAF-1", "type": "leaf-48-25g-pse", "rack": "A01", "position": 42, "face": "rear", "role": "leaf" },
+    { "id": "leaf2", "name": "A01-LEAF-2", "type": "leaf-48-25g-pse", "rack": "A01", "position": 41, "face": "rear", "role": "leaf" },
+    { "id": "fp1", "name": "A01-FP", "type": "generic-fiber-panel-24-lc", "rack": "A01", "position": 40, "face": "rear" },
+    { "id": "cm1", "name": "A01-CM", "type": "generic-cable-manager-1u", "rack": "A01", "position": 39, "face": "rear" },
+    { "id": "srv01", "name": "SRV-01", "type": "generic-server-1u", "rack": "A01", "position": 23 },
+    { "id": "srv02", "name": "SRV-02", "type": "generic-server-1u", "rack": "A01", "position": 22 },
+    { "id": "srv03", "name": "SRV-03", "type": "generic-server-1u", "rack": "A01", "position": 21 },
+    { "id": "srv04", "name": "SRV-04", "type": "generic-server-1u", "rack": "A01", "position": 20 },
+    { "id": "st1", "name": "STOR-01", "type": "generic-storage-2u", "rack": "A01", "position": 10 },
+    { "id": "fp2", "name": "A02-FP", "type": "generic-fiber-panel-24-lc", "rack": "A02", "position": 42 },
+    { "id": "spine1", "name": "A02-SPINE-1", "type": "generic-spine-32-100g", "rack": "A02", "position": 40, "role": "spine" }
+  ],
+  "pdus": [
+    { "id": "a01-pdu-a", "name": "A01-PDU-A", "rack": "A01", "feed": "A", "circuit": "UPS-A / PP-A1 / 07", "mounting": "0U-left", "voltage": 230, "maxAmps": 32, "phases": 1, "weightKg": 8, "outlets": [{ "connector": "C13", "count": 36 }, { "connector": "C19", "count": 6 }] },
+    { "id": "a01-pdu-b", "name": "A01-PDU-B", "rack": "A01", "feed": "B", "circuit": "UPS-B / PP-B1 / 07", "mounting": "0U-right", "voltage": 230, "maxAmps": 32, "phases": 1, "weightKg": 8, "outlets": [{ "connector": "C13", "count": 36 }, { "connector": "C19", "count": 6 }] },
+    { "id": "a02-pdu-a", "name": "A02-PDU-A", "rack": "A02", "feed": "A", "circuit": "UPS-A / PP-A1 / 08", "mounting": "0U-left", "voltage": 230, "maxAmps": 16, "phases": 1, "weightKg": 5, "outlets": [{ "connector": "C13", "count": 20 }, { "connector": "C19", "count": 4 }] },
+    { "id": "a02-pdu-b", "name": "A02-PDU-B", "rack": "A02", "feed": "B", "circuit": "UPS-B / PP-B1 / 08", "mounting": "0U-right", "voltage": 230, "maxAmps": 16, "phases": 1, "weightKg": 5, "outlets": [{ "connector": "C13", "count": 20 }, { "connector": "C19", "count": 4 }] }
+  ],
+  "powerLinks": [
+    { "device": "leaf1", "inlet": "PSU1", "pdu": "a01-pdu-a", "outlet": 1 },
+    { "device": "leaf1", "inlet": "PSU2", "pdu": "a01-pdu-b", "outlet": 1 },
+    { "device": "leaf2", "inlet": "PSU1", "pdu": "a01-pdu-a", "outlet": 2 },
+    { "device": "leaf2", "inlet": "PSU2", "pdu": "a01-pdu-b", "outlet": 2 },
+    { "device": "srv01", "inlet": "PSU1", "pdu": "a01-pdu-a", "outlet": 3 },
+    { "device": "srv01", "inlet": "PSU2", "pdu": "a01-pdu-b", "outlet": 3 },
+    { "device": "srv02", "inlet": "PSU1", "pdu": "a01-pdu-a", "outlet": 4 },
+    { "device": "srv02", "inlet": "PSU2", "pdu": "a01-pdu-b", "outlet": 4 },
+    { "device": "srv03", "inlet": "PSU1", "pdu": "a01-pdu-a", "outlet": 5 },
+    { "device": "srv03", "inlet": "PSU2", "pdu": "a01-pdu-b", "outlet": 5 },
+    { "device": "srv04", "inlet": "PSU1", "pdu": "a01-pdu-a", "outlet": 6 },
+    { "device": "srv04", "inlet": "PSU2", "pdu": "a01-pdu-b", "outlet": 6 },
+    { "device": "st1", "inlet": "PSU1", "pdu": "a01-pdu-a", "outlet": 7 },
+    { "device": "st1", "inlet": "PSU2", "pdu": "a01-pdu-b", "outlet": 7 },
+    { "device": "spine1", "inlet": "PSU1", "pdu": "a02-pdu-a", "outlet": 1 },
+    { "device": "spine1", "inlet": "PSU2", "pdu": "a02-pdu-b", "outlet": 1 }
+  ],
+  "cables": [
+    { "id": "d01", "label": "DC1-0001", "a": { "device": "srv01", "port": "nic1" }, "b": { "device": "leaf1", "port": "Eth1/1" }, "media": "dac", "lengthM": 2, "function": "data" },
+    { "id": "d02", "label": "DC1-0002", "a": { "device": "srv01", "port": "nic2" }, "b": { "device": "leaf2", "port": "Eth1/1" }, "media": "dac", "lengthM": 2, "function": "data" },
+    { "id": "d03", "label": "DC1-0003", "a": { "device": "srv02", "port": "nic1" }, "b": { "device": "leaf1", "port": "Eth1/2" }, "media": "dac", "lengthM": 2, "function": "data" },
+    { "id": "d04", "label": "DC1-0004", "a": { "device": "srv02", "port": "nic2" }, "b": { "device": "leaf2", "port": "Eth1/2" }, "media": "dac", "lengthM": 2, "function": "data" },
+    { "id": "d05", "label": "DC1-0005", "a": { "device": "srv03", "port": "nic1" }, "b": { "device": "leaf1", "port": "Eth1/3" }, "media": "dac", "lengthM": 2, "function": "data" },
+    { "id": "d06", "label": "DC1-0006", "a": { "device": "srv03", "port": "nic2" }, "b": { "device": "leaf2", "port": "Eth1/3" }, "media": "dac", "lengthM": 2, "function": "data" },
+    { "id": "d07", "label": "DC1-0007", "a": { "device": "srv04", "port": "nic1" }, "b": { "device": "leaf1", "port": "Eth1/4" }, "media": "dac", "lengthM": 2, "function": "data" },
+    { "id": "d08", "label": "DC1-0008", "a": { "device": "srv04", "port": "nic2" }, "b": { "device": "leaf2", "port": "Eth1/4" }, "media": "dac", "lengthM": 2, "function": "data" },
+    { "id": "s01", "label": "DC1-0011", "a": { "device": "st1", "port": "ctl1" }, "b": { "device": "leaf1", "port": "Eth1/10" }, "media": "dac", "lengthM": 3, "function": "storage" },
+    { "id": "s02", "label": "DC1-0012", "a": { "device": "st1", "port": "ctl2" }, "b": { "device": "leaf2", "port": "Eth1/10" }, "media": "dac", "lengthM": 3, "function": "storage" },
+    { "id": "f01", "label": "DC1-0021", "a": { "device": "leaf1", "port": "Eth1/49" }, "b": { "device": "fp1", "port": "1" }, "media": "os2", "lengthM": 2, "color": "yellow", "function": "uplink" },
+    { "id": "f02", "label": "DC1-0022", "a": { "device": "fp1", "port": "1", "side": "rear" }, "b": { "device": "fp2", "port": "1", "side": "rear" }, "media": "os2", "lengthM": 15, "color": "yellow", "function": "backbone", "pathway": "Overhead fiber runway, row A" },
+    { "id": "f03", "label": "DC1-0023", "a": { "device": "fp2", "port": "1" }, "b": { "device": "spine1", "port": "Eth1/1" }, "media": "os2", "lengthM": 2, "color": "yellow", "function": "uplink" },
+    { "id": "f04", "label": "DC1-0024", "a": { "device": "leaf2", "port": "Eth1/49" }, "b": { "device": "fp1", "port": "2" }, "media": "os2", "lengthM": 2, "color": "yellow", "function": "uplink" },
+    { "id": "f05", "label": "DC1-0025", "a": { "device": "fp1", "port": "2", "side": "rear" }, "b": { "device": "fp2", "port": "2", "side": "rear" }, "media": "os2", "lengthM": 15, "color": "yellow", "function": "backbone", "pathway": "Overhead fiber runway, row A" },
+    { "id": "f06", "label": "DC1-0026", "a": { "device": "fp2", "port": "2" }, "b": { "device": "spine1", "port": "Eth1/2" }, "media": "os2", "lengthM": 2, "color": "yellow", "function": "uplink" }
+  ]
+}

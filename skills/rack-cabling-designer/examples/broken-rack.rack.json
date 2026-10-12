@@ -1,0 +1,60 @@
+{
+  "$schema": "../assets/schema/rack-model.schema.json",
+  "modelVersion": 1,
+  "meta": {
+    "name": "Broken rack (training example)",
+    "description": "Deliberately wrong design used by the tests and for teaching: every rule family has at least one violation. Run validate on it and fix the findings one by one.",
+    "status": "design"
+  },
+  "policy": { "requireRedundantPower": true },
+  "racks": [
+    { "id": "X1", "heightU": 12, "depthMm": 600, "posts": 4, "maxLoadKg": 30, "frontAisle": "cold" }
+  ],
+  "equipmentTypes": [
+    {
+      "id": "deep-server",
+      "manufacturer": "Generic",
+      "model": "Deep 1U server, 2x10GBASE-T",
+      "category": "server",
+      "heightU": 1,
+      "depthMm": 900,
+      "weightKg": 20,
+      "airflow": "front-to-back",
+      "power": { "maxW": 400, "inlets": [{ "id": "PSU1", "connector": "C20" }, { "id": "PSU2", "connector": "C20" }] },
+      "ports": [
+        { "name": "x{1-2}", "connector": "rj45", "speed": "10G", "role": "data" },
+        { "name": "bmc", "connector": "rj45", "speed": "1G", "role": "mgmt" }
+      ]
+    }
+  ],
+  "devices": [
+    { "id": "sA", "type": "generic-server-2u", "rack": "X1", "position": 11 },
+    { "id": "sB", "type": "generic-server-1u", "rack": "X1", "position": 12 },
+    { "id": "sC", "type": "generic-server-1u", "rack": "X1", "position": 13 },
+    { "id": "sw", "type": "generic-leaf-48-25g-6-100g", "rack": "X1", "position": 5, "face": "rear" },
+    { "id": "deep", "type": "deep-server", "rack": "X1", "position": 1 },
+    { "id": "pp", "type": "generic-patch-panel-24-rj45", "rack": "X1", "position": 8 },
+    { "id": "wo", "type": "generic-wall-outlet-2" }
+  ],
+  "pdus": [
+    { "id": "p1", "rack": "X1", "feed": "A", "mounting": "0U-left", "voltage": 230, "maxAmps": 10, "outlets": [{ "connector": "C13", "count": 8 }] }
+  ],
+  "powerLinks": [
+    { "device": "sA", "inlet": "PSU1", "pdu": "p1", "outlet": 1 },
+    { "device": "sA", "inlet": "PSU2", "pdu": "p1", "outlet": 1 },
+    { "device": "sB", "inlet": "PSU1", "pdu": "p1", "outlet": 9 },
+    { "device": "deep", "inlet": "PSU1", "pdu": "p1", "outlet": 2 }
+  ],
+  "cables": [
+    { "id": "x1", "label": "X-001", "a": { "device": "sw", "port": "Eth1/1" }, "b": { "device": "pp", "port": "1" }, "media": "cat5e", "lengthM": 1 },
+    { "id": "x2", "label": "X-002", "a": { "device": "sA", "port": "eno1" }, "b": { "device": "pp", "port": "2" }, "media": "cat6", "lengthM": 2 },
+    { "id": "x2h", "label": "X-002H", "a": { "device": "pp", "port": "2", "side": "rear" }, "b": { "device": "wo", "port": "1", "side": "rear" }, "media": "cat6", "lengthM": 95 },
+    { "id": "x3", "label": "X-002", "a": { "device": "sA", "port": "eno2" }, "b": { "device": "pp", "port": "3" }, "media": "cat5e", "lengthM": 1 },
+    { "id": "x4", "label": "X-004", "a": { "device": "sB", "port": "nic1" }, "b": { "device": "sw", "port": "Eth1/2" }, "media": "dac", "lengthM": 9 },
+    { "id": "x5", "a": { "device": "sB", "port": "nic2" }, "b": { "device": "sw", "port": "Eth1/2" }, "media": "dac", "lengthM": 1 },
+    { "id": "x6", "a": { "device": "sC", "port": "eno1" }, "b": { "device": "sw", "port": "Eth1/99" }, "media": "cat6a", "lengthM": 1 },
+    { "id": "x7", "a": { "device": "deep", "port": "bmc" }, "b": { "device": "sw", "port": "mgmt0" }, "media": "om4", "lengthM": 2 },
+    { "id": "x8", "a": { "device": "deep", "port": "x1" }, "b": { "device": "pp", "port": "4" }, "media": "cat5e", "lengthM": 1 },
+    { "id": "x8h", "a": { "device": "pp", "port": "4", "side": "rear" }, "b": { "device": "wo", "port": "2", "side": "rear" }, "media": "cat5e", "lengthM": 30 }
+  ]
+}

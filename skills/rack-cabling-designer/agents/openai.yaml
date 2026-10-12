@@ -1,0 +1,6 @@
+interface:
+  display_name: "Rack & Cabling Designer"
+  short_description: "Rack elevations, cabling, power budgets and as-built docs"
+  default_prompt: "Design a rack and its cabling, validate it and generate the documentation."
+policy:
+  allow_implicit_invocation: true

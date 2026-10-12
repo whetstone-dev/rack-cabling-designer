@@ -1,0 +1,224 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://whetstone-dev.github.io/rack-cabling-designer/schemas/rack-model-1.schema.json",
+  "title": "Rack and cabling model (*.rack.json)",
+  "description": "Single source of truth for the rack-cabling-designer skill. See references/model.md. Lengths are metres, masses kilograms, power watts.",
+  "type": "object",
+  "required": ["modelVersion", "meta", "racks", "devices"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "modelVersion": { "const": 1, "description": "Format version (1)." },
+    "meta": { "$ref": "#/definitions/meta" },
+    "policy": { "$ref": "#/definitions/policy" },
+    "locations": { "type": "array", "items": { "$ref": "#/definitions/location" } },
+    "racks": { "type": "array", "items": { "$ref": "#/definitions/rack" } },
+    "equipmentTypes": { "type": "array", "items": { "$ref": "#/definitions/equipmentType" } },
+    "devices": { "type": "array", "items": { "$ref": "#/definitions/device" } },
+    "pdus": { "type": "array", "items": { "$ref": "#/definitions/pdu" } },
+    "powerLinks": { "type": "array", "items": { "$ref": "#/definitions/powerLink" } },
+    "cables": { "type": "array", "items": { "$ref": "#/definitions/cable" } }
+  },
+  "definitions": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$", "description": "letters, digits, . _ - (max 64)" },
+    "text": { "type": "string", "maxLength": 2000 },
+    "status": { "enum": ["planned", "existing", "remove"] },
+    "speed": { "enum": ["100M", "1G", "2.5G", "5G", "10G", "25G", "40G", "100G"] },
+    "portConnector": { "enum": ["rj45", "lc-duplex", "sc-duplex", "mpo-12", "mpo-24", "sfp", "sfp+", "sfp28", "qsfp+", "qsfp28", "punchdown"] },
+    "media": { "enum": ["cat5e", "cat6", "cat6a", "cat8", "om1", "om2", "om3", "om4", "om5", "os2", "dac", "aoc"] },
+    "meta": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "description": { "$ref": "#/definitions/text" },
+        "site": { "type": "string", "maxLength": 200 },
+        "revision": { "type": "string", "maxLength": 50 },
+        "status": { "enum": ["design", "as-built", "change"] },
+        "author": { "type": "string", "maxLength": 200 },
+        "language": { "type": "string", "maxLength": 20 }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "powerDerating": { "type": "number", "minimum": 0.1, "maximum": 1, "description": "Fraction of circuit capacity usable for continuous load (default 0.8)." },
+        "powerBasis": { "enum": ["max", "typical"], "description": "Which equipment power figure the budget uses (default max)." },
+        "requireRedundantPower": { "type": "boolean" },
+        "requireBlankingPanels": { "type": "boolean" },
+        "maxRackUtilization": { "type": "number", "minimum": 0.1, "maximum": 1 },
+        "labelPattern": { "type": "string", "maxLength": 200, "description": "Regular expression every cable label must match." },
+        "colorByFunction": { "type": "object", "additionalProperties": { "type": "string", "maxLength": 40 } },
+        "cableSlackPercent": { "type": "number", "minimum": 0, "maximum": 100 },
+        "stockLengthsM": { "type": "array", "items": { "type": "number", "minimum": 0.1, "maximum": 1000 } }
+      }
+    },
+    "location": {
+      "type": "object",
+      "required": ["id", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "name": { "type": "string", "maxLength": 200 },
+        "kind": { "enum": ["site", "building", "floor", "room", "row", "cage", "work-area"] },
+        "parent": { "$ref": "#/definitions/id" },
+        "notes": { "$ref": "#/definitions/text" }
+      }
+    },
+    "rack": {
+      "type": "object",
+      "required": ["id", "heightU"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "name": { "type": "string", "maxLength": 100 },
+        "location": { "$ref": "#/definitions/id" },
+        "heightU": { "type": "integer", "minimum": 1, "maximum": 60 },
+        "widthIn": { "enum": [19, 23] },
+        "depthMm": { "type": "number", "minimum": 100, "maximum": 2000 },
+        "posts": { "enum": [2, 4] },
+        "maxLoadKg": { "type": "number", "minimum": 1, "maximum": 5000 },
+        "frontAisle": { "enum": ["cold", "hot", "none"], "description": "Aisle the rack front faces (default cold)." },
+        "notes": { "$ref": "#/definitions/text" }
+      }
+    },
+    "portSpec": {
+      "type": "object",
+      "required": ["name", "connector"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 80, "description": "Port name; {a-b} expands a numeric range, e.g. Gi1/0/{1-48}." },
+        "connector": { "$ref": "#/definitions/portConnector" },
+        "rearConnector": { "$ref": "#/definitions/portConnector" },
+        "speed": { "$ref": "#/definitions/speed" },
+        "role": { "enum": ["data", "uplink", "mgmt", "console", "storage"] }
+      }
+    },
+    "inletSpec": {
+      "type": "object",
+      "required": ["id", "connector"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "connector": { "type": "string", "maxLength": 20, "description": "Appliance inlet, e.g. C14, C20." }
+      }
+    },
+    "equipmentType": {
+      "type": "object",
+      "required": ["id", "category", "heightU"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "manufacturer": { "type": "string", "maxLength": 100 },
+        "model": { "type": "string", "maxLength": 100 },
+        "category": { "enum": ["switch", "router", "firewall", "server", "storage", "patch-panel", "outlet", "cable-manager", "blanking", "shelf", "ups", "kvm", "other"] },
+        "heightU": { "type": "integer", "minimum": 0, "maximum": 60 },
+        "fullDepth": { "type": "boolean", "description": "Occupies the U on both rack faces (default true except passive/blanking/cable-manager)." },
+        "depthMm": { "type": "number", "minimum": 0, "maximum": 2000 },
+        "weightKg": { "type": "number", "minimum": 0, "maximum": 2000 },
+        "airflow": { "enum": ["front-to-back", "back-to-front", "side-to-side", "passive"], "description": "Relative to the equipment front as defined by this type." },
+        "power": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "typicalW": { "type": "number", "minimum": 0, "maximum": 100000 },
+            "maxW": { "type": "number", "minimum": 0, "maximum": 100000 },
+            "inlets": { "type": "array", "items": { "$ref": "#/definitions/inletSpec" } }
+          }
+        },
+        "ports": { "type": "array", "items": { "$ref": "#/definitions/portSpec" } },
+        "notes": { "$ref": "#/definitions/text" }
+      }
+    },
+    "device": {
+      "type": "object",
+      "required": ["id", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "name": { "type": "string", "maxLength": 100 },
+        "type": { "$ref": "#/definitions/id" },
+        "rack": { "$ref": "#/definitions/id" },
+        "position": { "type": "integer", "minimum": 1, "maximum": 60, "description": "Lowest rack unit occupied (U1 at the bottom)." },
+        "face": { "enum": ["front", "rear"], "description": "Rack face the equipment front faces (default front)." },
+        "location": { "$ref": "#/definitions/id" },
+        "role": { "type": "string", "maxLength": 60 },
+        "netRef": { "type": "string", "maxLength": 100, "description": "Device id in a network-engineering *.net.json model." },
+        "status": { "$ref": "#/definitions/status" },
+        "notes": { "$ref": "#/definitions/text" }
+      }
+    },
+    "outletGroup": {
+      "type": "object",
+      "required": ["connector", "count"],
+      "additionalProperties": false,
+      "properties": {
+        "connector": { "type": "string", "maxLength": 20 },
+        "count": { "type": "integer", "minimum": 1, "maximum": 96 }
+      }
+    },
+    "pdu": {
+      "type": "object",
+      "required": ["id", "rack", "feed", "voltage", "maxAmps", "outlets"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "name": { "type": "string", "maxLength": 100 },
+        "rack": { "$ref": "#/definitions/id" },
+        "feed": { "type": "string", "pattern": "^[A-Za-z0-9_-]{1,8}$", "description": "Power feed / source, e.g. A or B." },
+        "circuit": { "type": "string", "maxLength": 60, "description": "Upstream panel/breaker reference." },
+        "mounting": { "enum": ["0U-left", "0U-right", "rack"] },
+        "position": { "type": "integer", "minimum": 1, "maximum": 60 },
+        "heightU": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "face": { "enum": ["front", "rear"] },
+        "voltage": { "type": "number", "minimum": 12, "maximum": 480 },
+        "maxAmps": { "type": "number", "minimum": 1, "maximum": 125 },
+        "phases": { "enum": [1, 3] },
+        "weightKg": { "type": "number", "minimum": 0, "maximum": 100 },
+        "outlets": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/outletGroup" } },
+        "notes": { "$ref": "#/definitions/text" }
+      }
+    },
+    "powerLink": {
+      "type": "object",
+      "required": ["device", "inlet", "pdu", "outlet"],
+      "additionalProperties": false,
+      "properties": {
+        "device": { "$ref": "#/definitions/id" },
+        "inlet": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "pdu": { "$ref": "#/definitions/id" },
+        "outlet": { "type": "integer", "minimum": 1, "maximum": 96 }
+      }
+    },
+    "endpoint": {
+      "type": "object",
+      "required": ["device", "port"],
+      "additionalProperties": false,
+      "properties": {
+        "device": { "$ref": "#/definitions/id" },
+        "port": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "side": { "enum": ["front", "rear"], "description": "For passive panels/outlets only (default front)." }
+      }
+    },
+    "cable": {
+      "type": "object",
+      "required": ["id", "a", "b", "media"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "label": { "type": "string", "maxLength": 80 },
+        "a": { "$ref": "#/definitions/endpoint" },
+        "b": { "$ref": "#/definitions/endpoint" },
+        "media": { "$ref": "#/definitions/media" },
+        "lengthM": { "type": "number", "minimum": 0.1, "maximum": 20000 },
+        "color": { "type": "string", "maxLength": 40 },
+        "function": { "enum": ["data", "uplink", "mgmt", "console", "storage", "crossconnect", "horizontal", "backbone", "other"] },
+        "pathway": { "type": "string", "maxLength": 100 },
+        "status": { "$ref": "#/definitions/status" },
+        "notes": { "$ref": "#/definitions/text" }
+      }
+    }
+  }
+}

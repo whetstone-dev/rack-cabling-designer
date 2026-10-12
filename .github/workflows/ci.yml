@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Skill format and links
+        run: node tools/lint-skill.ts
+      - name: Manifest is up to date
+        run: node tools/build-manifest.ts --check
+      - name: Core, adapter and installer tests
+        run: npm test
+      - name: Structural + local functional audit (every platform x scope)
+        run: node tools/audit.ts
+      - name: Self-test from the payload
+        run: node skills/rack-cabling-designer/scripts/rackcab.ts selftest
+      - name: Installer dry run (all assistants, both scopes)
+        shell: bash
+        run: |
+          node installer/install.ts --agents all --scope user --dry-run
+          node installer/install.ts --agents all --scope project --dry-run
+
+  skills-ref:
+    # Official reference validator (demo-grade, installed from source): informational.
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install skills-ref from source
+        run: |
+          git clone --depth 1 https://github.com/agentskills/agentskills.git /tmp/agentskills
+          pip install /tmp/agentskills/skills-ref
+      - name: Validate
+        run: skills-ref validate skills/rack-cabling-designer

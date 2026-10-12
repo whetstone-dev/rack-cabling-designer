@@ -1,0 +1,15 @@
+{
+  "dataVersion": "1",
+  "note": "Planning defaults. The electrical code in force (e.g. NEC, IEC 60364, RETIE) and a qualified electrician govern circuit sizing.",
+  "defaultDerating": 0.8,
+  "deratingSource": "Continuous-load practice of loading branch circuits to 80% of the breaker rating (e.g. NEC 210.20(A)); set policy.powerDerating to match the local code",
+  "wattsToBtuPerHour": 3.412,
+  "inletOutlet": {
+    "C14": { "ok": ["C13"], "adapter": ["C19"] },
+    "C20": { "ok": ["C19"], "adapter": [] },
+    "C8": { "ok": ["C7"], "adapter": [] },
+    "C6": { "ok": ["C5"], "adapter": [] },
+    "NEMA-5-15P": { "ok": ["NEMA-5-15R", "NEMA-5-20R"], "adapter": [] },
+    "CEE-7/7": { "ok": ["CEE-7/3", "CEE-7/5"], "adapter": [] }
+  }
+}

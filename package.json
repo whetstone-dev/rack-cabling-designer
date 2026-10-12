@@ -1,0 +1,20 @@
+{
+  "name": "rack-cabling-designer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agent skill for rack, structured cabling and rack power design, with a multi-assistant installer.",
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=22.18" },
+  "scripts": {
+    "test": "node --test \"skills/rack-cabling-designer/scripts/test/*.test.ts\" \"tests/**/*.test.ts\"",
+    "test:core": "node --test \"skills/rack-cabling-designer/scripts/test/*.test.ts\"",
+    "test:installer": "node --test \"tests/**/*.test.ts\"",
+    "lint:skill": "node tools/lint-skill.ts",
+    "manifest": "node tools/build-manifest.ts",
+    "manifest:check": "node tools/build-manifest.ts --check",
+    "install-skill": "node installer/install.ts",
+    "smoke": "node tests/platform-smoke/smoke.ts",
+    "audit": "node tools/audit.ts"
+  }
+}
