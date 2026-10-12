@@ -189,11 +189,11 @@ The core is a standard [Agent Skills](https://agentskills.io/specification) fold
 | Assistant | Install location (user · project) | Structural | Toolkit from installed copy | Activation in the real assistant |
 |---|---|:---:|:---:|---|
 | **Claude Code** | `~/.claude/skills` · `.claude/skills` | ✅ | ✅ | ✅ **Verified.** CLI: discovery, implicit (`Skill` tool) and explicit `/rack-cabling-designer`, with a negative control. Desktop app: listed and invoked in a live session |
-| **OpenAI Codex** | `~/.agents/skills` · `.agents/skills` | ✅ | ✅ | ⚠️ **Partial.** Discovery verified, and the skill was selected implicitly. Execution not yet confirmed (Windows sandbox bug [openai/codex#30024](https://github.com/openai/codex/issues/30024), account usage limit) |
-| **Cursor 2.4+** | `~/.cursor/skills` · `.cursor/skills` | ✅ | ✅ | ⏳ **Not verified yet** |
+| **OpenAI Codex** | `~/.agents/skills` · `.agents/skills` | ✅ | ✅ | ✅ **Verified.** Discovery, implicit activation and explicit `$rack-cabling-designer` in the real assistant |
+| **Cursor 2.4+** | `~/.cursor/skills` · `.cursor/skills` | ✅ | ✅ | ✅ **Verified.** Discovery, implicit activation and explicit `/rack-cabling-designer` in the real editor |
 | Other Agent Skills apps | `--target <skills folder>` | ✅ | ✅ | depends on the app |
 
-Evidence for every cell: [docs/audit/2026-10-12-audit.md](docs/audit/2026-10-12-audit.md). Per-platform capabilities and known limitations: [docs/compatibility.md](docs/compatibility.md).
+Automated evidence: [docs/audit/2026-10-12-audit.md](docs/audit/2026-10-12-audit.md). Codex and Cursor activation was confirmed in manual tests in the real apps on 2026-10-12. Per-platform capabilities and known limitations: [docs/compatibility.md](docs/compatibility.md).
 
 ## Architecture
 
