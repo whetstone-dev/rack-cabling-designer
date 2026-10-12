@@ -6,6 +6,8 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [
 
 ### Added
 
+- **Website and docs** at https://whetstone-dev.github.io/rack-cabling-designer/ (`web/`, published by the Pages workflow): interactive rack built from the bundled examples, 13 docs pages and a library of 27 prompts. The build serves the real example outputs and the JSON Schema at the URL its `$id` declares.
+
 - **Installer interface:** numbered interactive steps (assistants, scope, plan, authorization, review, result).
 - **Selection:**
   - Manual selection of undetected assistants, after showing what cannot be detected or verified.
@@ -16,6 +18,7 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [
 
 ### Changed
 
+- OpenAI Codex and Cursor are now declared **compatible**: activation was confirmed manually in the real apps (see the audit addendum).
 - The installer is split into detection (`detect.ts`), planning (`plan.ts`), execution (`execute.ts`, `uninstall.ts`) and verification (`verify.ts`).
 - Filesystem errors are explained (permission, busy, disk full, file instead of folder).
 

@@ -24,8 +24,8 @@ Legend: ✅ supported and verified in this repo · ☑️ supported per official
 | **Structural audit** (`tools/audit.ts`) | ✅ user + project | ✅ user + project | ✅ user + project |
 | **Functional, local** (toolkit run from the installed copy) | ✅ | ✅ | ✅ |
 | **Functional, real assistant (headless)** | ✅ 4/4: control, discovery, implicit (`Skill` tool call), explicit `/` | ⚠️ 2/4 PASS (control, discovery). Implicit: skill selected, but the Windows sandbox failed to spawn. Explicit: account usage limit. Both INCONCLUSIVE | ⛔ not run (no CLI) |
-| **Manual, in the app UI** | ✅ desktop app (Code tab) · ⏳ IDE extension | ⏳ pending (usage limit) | ⛔ editor not installed on the audit machine |
-| **Declared status** | **Compatible (CLI + desktop app)** | **Not yet declared**: structural ✅, discovery ✅ | **Not yet declared**: structural only |
+| **Manual, in the app UI** | ✅ desktop app (Code tab) · ⏳ IDE extension | ✅ discovery, implicit and explicit activation (maintainer, 2026-10-12) | ✅ discovery, implicit and explicit activation (maintainer, 2026-10-12) |
+| **Declared status** | **Compatible (CLI + desktop app)** | **Compatible** (verified manually in the real app) | **Compatible** (verified manually in the real editor) |
 
 Evidence and open items: [audit/2026-10-12-audit.md](audit/2026-10-12-audit.md).
 
@@ -57,7 +57,7 @@ Evidence and open items: [audit/2026-10-12-audit.md](audit/2026-10-12-audit.md).
    - The Windows sandbox once failed to spawn processes (`CreateProcessAsUserW … 1312`).
    - The account then hit its usage limit.
 
-   None of these is a skill defect, but together they prevent declaring functional compatibility yet.
+   None of these is a skill defect. They blocked the automated headless run only; activation was then confirmed manually in the real app (2026-10-12).
 4. **Cursor version** cannot be read from disk; skills need 2.4+.
 5. **Agent-driven installs.** Codex's sandbox protects `.agents/`, so asking Codex itself to run the installer into `.agents/skills` needs approval. Running the installer yourself in a terminal is unaffected.
 6. **Windows links.** `--link` uses directory junctions (no admin rights needed). Copies are the default.

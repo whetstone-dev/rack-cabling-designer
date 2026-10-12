@@ -23,6 +23,7 @@
   - Codex CLI 0.145.0: control and discovery **PASS**. Implicit and explicit were **INCONCLUSIVE**: the Windows sandbox failed to spawn, then the account hit its usage limit.
   - Cursor: **not run**, because no CLI is on PATH.
   - Full matrix and evidence: [audit/2026-10-12-audit.md](audit/2026-10-12-audit.md).
+- Level 3 (manual, in the real apps): Claude Code desktop app, OpenAI Codex and Cursor **PASS**. The skill was discovered and activated implicitly and explicitly (maintainer, 2026-10-12).
 - Structural and local functional audit: `node tools/audit.ts` covers 7 targets (3 platforms × 2 scopes + custom) with 93 checks, all passing. Report: [audit/2026-10-12-structural.md](audit/2026-10-12-structural.md).
 - CI ([run 38312714208](https://github.com/whetstone-dev/rack-cabling-designer/actions/runs/38312714208)): 7/7 jobs green.
   - Ubuntu, macOS and Windows × Node 22 and 24, 69 tests per leg.
