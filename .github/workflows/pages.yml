@@ -1,0 +1,60 @@
+name: Pages
+
+# Builds the website (web/, Next.js static export) and publishes it to GitHub Pages.
+# The build runs the skill's own toolkit on its examples, so the site always shows real outputs.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - 'skills/rack-cabling-designer/SKILL.md'
+      - 'skills/rack-cabling-designer/examples/**'
+      - 'skills/rack-cabling-designer/scripts/**'
+      - 'skills/rack-cabling-designer/assets/**'
+      - 'docs/assets/social-preview.png'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck
+        run: npm run build-examples && npm run typecheck
+      - name: Static build
+        run: npm run build
+        env:
+          PAGES_BASE_PATH: /rack-cabling-designer
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,172 @@
+One JSON file describes the racks, equipment, power and cabling of a site. Every output is generated from it. The [JSON Schema](../../../schemas/rack-model-1.schema.json) rejects unknown fields, so typos are caught before any rule runs.
+
+```console
+✖ error   RCD-SCHEMA             $.racks[0].heigthU: unknown field "heigthU" (did you mean "heightU"?)
+```
+
+**Units are fixed:** metres, kilograms, watts, volts, amperes, and millimetres for depth. Convert imperial values before writing them.
+
+## A complete example
+
+This is the shape of [datacenter-pod.rack.json](../../../examples/datacenter-pod/datacenter-pod.rack.json), trimmed to one item per list:
+
+```jsonc
+{
+  "$schema": "https://whetstone-dev.github.io/rack-cabling-designer/schemas/rack-model-1.schema.json",
+  "modelVersion": 1,
+  "meta": { "name": "Data hall pod A", "site": "DC1 - Data hall 1, row A", "status": "design" },
+  "policy": { "powerDerating": 0.8, "requireRedundantPower": true, "labelPattern": "^DC1-\\d{4}$" },
+  "racks": [{ "id": "A01", "heightU": 42, "depthMm": 1200, "posts": 4, "maxLoadKg": 1000, "frontAisle": "cold" }],
+  "devices": [{ "id": "srv01", "name": "SRV-01", "type": "generic-server-1u", "rack": "A01", "position": 23 }],
+  "pdus": [{ "id": "a01-pdu-a", "rack": "A01", "feed": "A", "mounting": "0U-left", "voltage": 230, "maxAmps": 32,
+             "phases": 1, "outlets": [{ "connector": "C13", "count": 36 }, { "connector": "C19", "count": 6 }] }],
+  "powerLinks": [{ "device": "srv01", "inlet": "PSU1", "pdu": "a01-pdu-a", "outlet": 3 }],
+  "cables": [{ "id": "d01", "label": "DC1-0001", "media": "dac", "lengthM": 2,
+               "a": { "device": "srv01", "port": "nic1" }, "b": { "device": "leaf1", "port": "Eth1/1" } }]
+}
+```
+
+## Top level
+
+| Field | Required | Content |
+|---|---|---|
+| `modelVersion` | yes | Always `1` |
+| `meta` | yes | `name` (required), `description`, `site`, `revision`, `status` (`design`, `as-built`, `change`), `author`, `language` |
+| `policy` | no | Rule tuning (below) |
+| `locations[]` | no | Sites, rooms, rows, work areas |
+| `racks[]` | yes | Racks and cabinets |
+| `equipmentTypes[]` | no | Datasheet-level definitions; they override catalog ids with the same `id` |
+| `devices[]` | yes | Installed or planned equipment |
+| `pdus[]` | no | Power distribution units |
+| `powerLinks[]` | no | Device inlet → PDU outlet |
+| `cables[]` | no | Every data cable, cord and installed link |
+
+Ids use letters, digits, `.`, `_` and `-`, up to 64 characters. Racks, devices and PDUs share one namespace.
+
+## policy
+
+| Field | Default | Effect |
+|---|---|---|
+| `powerDerating` | `0.8` | Usable fraction of the circuit capacity |
+| `powerBasis` | `max` | Budget on equipment `maxW` (`typical` uses `typicalW`) |
+| `requireRedundantPower` | `false` | Single-fed devices and single-feed sites become warnings |
+| `requireBlankingPanels` | `false` | Open cold-face units become warnings instead of info |
+| `maxRackUtilization` | none | Fraction of front units that may be used (growth reserve) |
+| `labelPattern` | none | Regular expression every cable label must match |
+| `colorByFunction` | none | `{ "uplink": "yellow" }`: cables with that `function` must have that `color` |
+| `cableSlackPercent` | `10` | Added to installed-link lengths in the BOM |
+| `stockLengthsM` | `0.5 … 50` | Cord lengths the BOM rounds up to |
+
+## racks[]
+
+| Field | Notes |
+|---|---|
+| `id`, `name` | |
+| `heightU` | 1–60 |
+| `widthIn` | 19 or 23 |
+| `depthMm` | Usable mounting depth; enables depth checks |
+| `posts` | 2 or 4 |
+| `maxLoadKg` | Rated static load; enables weight checks |
+| `frontAisle` | `cold` (default), `hot`, or `none` (wall cabinet: airflow checks skipped) |
+| `location`, `notes` | |
+
+## equipmentTypes[]
+
+| Field | Notes |
+|---|---|
+| `id`, `manufacturer`, `model` | |
+| `category` | `switch`, `router`, `firewall`, `server`, `storage`, `patch-panel`, `outlet`, `cable-manager`, `blanking`, `shelf`, `ups`, `kvm`, `other` |
+| `heightU` | `0` for wall outlets and other non-rack items |
+| `fullDepth` | Occupies the unit on both faces. Default `true`, except panels, outlets, cable managers, blanking panels and shelves |
+| `depthMm`, `weightKg` | From the datasheet |
+| `airflow` | Relative to the type's front: `front-to-back`, `back-to-front`, `side-to-side`, `passive` |
+| `power` | `{ "typicalW", "maxW", "inlets": [{ "id": "PSU1", "connector": "C14" }] }` |
+| `ports[]` | `{ "name", "connector", "rearConnector", "speed", "role" }` |
+
+<Callout type="note" title="The front of network gear is the port side">
+A switch whose ports face the rear of the rack is a device with `"face": "rear"`. Pick `airflow` to match: "port-side intake" is `front-to-back`, "port-side exhaust" is `back-to-front`.
+</Callout>
+
+Port names expand numeric ranges: `"Gi1/0/{1-48}"` becomes `Gi1/0/1` … `Gi1/0/48`. Connectors: `rj45`, `lc-duplex`, `sc-duplex`, `mpo-12`, `mpo-24`, `sfp`, `sfp+`, `sfp28`, `qsfp+`, `qsfp28`, `punchdown`. Speeds: `100M`, `1G`, `2.5G`, `5G`, `10G`, `25G`, `40G`, `100G`.
+
+Patch panels and outlets are **passive**: port N has a front and a rear, connected internally. `rearConnector` describes the rear (for example `punchdown`).
+
+### Generic catalog types
+
+Start before datasheets exist with the generic catalog; replace the placeholders before procurement. `rackcab catalog` lists them:
+
+```console
+generic-patch-panel-24-rj45     1U  patch-panel    24-port Cat6A patch panel 1U
+generic-fiber-panel-24-lc       1U  patch-panel    24-port LC duplex fiber panel 1U
+generic-switch-48-1g-4sfpp      1U  switch         Access switch 48x1G RJ45 + 4x10G SFP+
+generic-leaf-48-25g-6-100g      1U  switch         Leaf switch 48x25G SFP28 + 6x100G QSFP28
+generic-spine-32-100g           1U  switch         Spine switch 32x100G QSFP28
+generic-server-1u               1U  server         1U rack server, 2x25G + 2x1G + BMC
+generic-storage-2u              2U  storage        2U storage array, 4x25G + mgmt
+generic-cable-manager-1u        1U  cable-manager  Horizontal cable manager 1U
+```
+
+## devices[]
+
+| Field | Notes |
+|---|---|
+| `id`, `name` | `name` is what drawings and labels show |
+| `type` | An `equipmentTypes` id or a catalog id |
+| `rack`, `position` | `position` is the **lowest** unit occupied; U1 is at the bottom |
+| `face` | Rack face the equipment front looks at (`front` by default) |
+| `location` | For unracked items such as wall outlets |
+| `role`, `netRef` | `netRef` links to a device in a [network-engineering](https://whetstone-dev.github.io/network-engineering/) model |
+| `status` | `planned` (default), `existing`, `remove` |
+
+A 2U device at `position: 10` occupies U10–U11. A device with `status: remove` still occupies its units, weight and power until the change is done, but is left out of the BOM.
+
+## pdus[]
+
+| Field | Notes |
+|---|---|
+| `id`, `name`, `rack` | |
+| `feed` | Power source label (`A`, `B`…). The failover analysis removes one feed at a time |
+| `circuit` | Upstream panel and breaker reference, for documentation |
+| `mounting` | `0U-left`, `0U-right` (side channels, no units) or `rack` (needs `position`, `heightU`, `face`) |
+| `voltage`, `maxAmps`, `phases` | Capacity = V × A (single phase) or √3 × V × A (three phase, line-to-line) |
+| `outlets[]` | Groups numbered consecutively from 1: `[{ "connector": "C13", "count": 36 }, { "connector": "C19", "count": 6 }]` makes C13 = 1–36 and C19 = 37–42 |
+| `weightKg` | Included in the rack weight |
+
+## powerLinks[]
+
+`{ "device": "srv01", "inlet": "PSU1", "pdu": "a01-pdu-a", "outlet": 3 }`. One link per inlet, one inlet per outlet.
+
+## cables[]
+
+| Field | Notes |
+|---|---|
+| `id` | Unique |
+| `label` | Printed identifier; checked for uniqueness and against `policy.labelPattern` |
+| `a`, `b` | `{ "device", "port", "side" }`; `side` (`front` or `rear`) only for panels and outlets |
+| `media` | `cat5e`, `cat6`, `cat6a`, `cat8`, `om1`–`om5`, `os2`, `dac`, `aoc` |
+| `lengthM` | Needed for reach checks and BOM sizing |
+| `color`, `function` | `function`: `data`, `uplink`, `mgmt`, `console`, `storage`, `crossconnect`, `horizontal`, `backbone`, `other` |
+| `pathway`, `status`, `notes` | |
+
+### Channels
+
+The toolkit chains cables through passive panels into **channels**: switch port → cord → panel front | panel rear → installed cable → outlet rear | outlet front. A cable between two rears is a **permanent link**; any other cable is a **cord**. Reach is checked on the whole channel, using the slowest active-port speed and the lowest-grade media. `rackcab trace` shows one channel end to end:
+
+```console
+CH011 · 3 cable(s) · 19 m · 100G
+  1. DC1-0021 · os2 · 2 m · cord
+     A01 compute.U42:A01-LEAF-1:Eth1/49  →  A01 compute.U40:A01-FP:1
+  2. DC1-0022 · os2 · 15 m · permanent
+     A01 compute.U40:A01-FP:1(rear)  →  A02 network.U42:A02-FP:1(rear)
+  3. DC1-0023 · os2 · 2 m · cord
+     A02 network.U42:A02-FP:1  →  A02 network.U40:A02-SPINE-1:Eth1/1
+```
+
+Breakout cables (one QSFP to four SFP) are not modeled: model one cable per lane group and note the breakout.
+
+## Next steps
+
+<Cards>
+  <Card href="../cli-reference/" title="rackcab CLI">Validate, build and trace from the terminal.</Card>
+  <Card href="../rules/" title="Rule reference">What every finding means and how to fix it.</Card>
+</Cards>

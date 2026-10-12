@@ -1,0 +1,85 @@
+Every finding has a code (`RCD-<family>-<rule>`), a severity, the numbers involved and, where a limit comes from a standard, its source. **Errors** fail the validation gate, **warnings** fail it only with `--strict`, **info** is advice. Some rules raise different severities depending on how far the model is from the limit.
+
+<Callout type="note" title="Not checked is not passed">
+Findings that say a value could not be checked (missing depth, weight, airflow, power or length) are **INCONCLUSIVE**. The skill reports them as open questions, never as passes.
+</Callout>
+
+## Model integrity
+
+| Code | Severity | What it catches |
+|---|---|---|
+| `RCD-SCHEMA` | error | The model does not match the JSON Schema: missing required fields, wrong types, unknown fields (with a "did you mean" hint). Schema errors stop the other rules. |
+| `RCD-DUP-ID` | error | Two items share an id. Racks, devices and PDUs share one namespace. |
+| `RCD-REF` | error | A reference to something that does not exist: unknown equipment type, rack or location, or a location that is its own parent. |
+
+## Rack fit
+
+| Code | Severity | What it catches | Typical fix |
+|---|---|---|---|
+| `RCD-RACK-POSITION` | error | A racked device without `position`, a `position` without `rack`, or a rack-mount PDU without position | Complete or remove the placement |
+| `RCD-RACK-BOUNDS` | error | Equipment extends below U1 or above the rack height (a 2U device at U42 of a 42U rack) | Lower the `position` |
+| `RCD-RACK-OVERLAP` | error | Two items on the same face share a unit. Half-depth items on opposite faces may share; full-depth items may not | Move one item |
+| `RCD-RACK-DEPTH` | error · warning · info | Device deeper than the rack (error); front and rear half-depth items that add up to more than the rack depth (warning); depth not checked (info) | Deeper rack, shorter device, or enter `depthMm` |
+| `RCD-RACK-WEIGHT` | error · warning · info | Total weight over `maxLoadKg` (error) or above 90% of it (warning); items without weight (info) | Move load to another rack, confirm the rating |
+| `RCD-RACK-UTIL` | warning | Front units used above `policy.maxRackUtilization` | Reserve growth space elsewhere |
+| `RCD-RACK-2POST` | warning | A device over 25 kg or deeper than 400 mm on a 2-post rack (a screening heuristic; the vendor's 2-post kit rating governs) | Use a 4-post rack or a rated kit |
+
+## Airflow
+
+| Code | Severity | What it catches | Typical fix |
+|---|---|---|---|
+| `RCD-AIR-RECIRC` | error | Equipment that takes its air from the hot aisle, from its `airflow`, its mounting `face` and the rack's `frontAisle` | Reverse the mounting or order the opposite airflow option (port-side intake vs exhaust) |
+| `RCD-AIR-SIDE` | warning | Side-to-side equipment in a rack with aisles; it needs a side-intake duct kit the tool cannot verify | Add and document the duct kit |
+| `RCD-AIR-BLANKING` | info · warning | Open units on the cold face (a warning when `policy.requireBlankingPanels` is set). The BOM adds the blanking panels | Fit blanking panels |
+| `RCD-AIR-DATA` | info | Active equipment without `airflow`: not checked | Add the airflow from the datasheet |
+
+<PromptRef id="hot-aisle-intake" />
+
+## Power
+
+| Code | Severity | What it catches | Typical fix |
+|---|---|---|---|
+| `RCD-PWR-OUTLET` | error | An outlet number beyond the PDU's count, or two cords on one outlet | Pick a free, existing outlet |
+| `RCD-PWR-INLET` | error | An inlet id that is not on the equipment type, or an inlet connected twice | Fix the inlet id |
+| `RCD-PWR-CONNECTOR` | error · warning | An inlet that cannot be fed from that outlet type (C20 on C13) is an error; a combination that needs a hybrid cord is a warning | Use the matching outlet group |
+| `RCD-PWR-RACK` | warning | A device fed from a PDU in another rack | Feed it from its own rack |
+| `RCD-PWR-DATA` | warning | No power figure on a device: counted as 0 W | Add `typicalW` / `maxW` |
+| `RCD-PWR-UNPOWERED` | warning | A device with no power links, or with declared inlets left unconnected | Connect every PSU |
+| `RCD-PWR-REDUNDANCY` | warning | All inlets of a device on one feed; with `requireRedundantPower`, single-fed devices or a site with one feed | Spread inlets across feeds A and B |
+| `RCD-PWR-CAPACITY` | error | Normal load over the derated (usable) capacity of a PDU | Larger circuit, second PDU pair, move load |
+| `RCD-PWR-FAILOVER` | error | Load on the surviving PDU when one feed fails is over its usable capacity | As above; failover is what sizes A/B PDUs |
+
+The power budget uses `policy.powerBasis` (max by default) and `policy.powerDerating` (0.8 by default, the continuous-load practice of NEC 210.20(A)). A device's load is split evenly across its connected inlets; when a feed is lost, the surviving inlets carry it all (APPROXIMATE).
+
+<PromptRef id="feed-failure" />
+
+## Cabling
+
+| Code | Severity | What it catches | Typical fix |
+|---|---|---|---|
+| `RCD-CBL-SELF` | error | A cable whose two ends are the same port | Fix one end |
+| `RCD-CBL-SIDE` | error | `side` on an active device (only panels and outlets have a front and a rear) | Remove `side` |
+| `RCD-CBL-PORT` | error | A port name that does not exist on the type (ranges such as `Eth1/{1-48}` are expanded) | Use an existing port |
+| `RCD-CBL-PORT-REUSE` | error | Two cables on the same port and side | Move one cable |
+| `RCD-CBL-MEDIA` | error · warning | Media the port cannot take (fiber into RJ45, copper into SFP28, an SFP-to-QSFP breakout); a copper SFP module is a warning (power, heat, reach) | Change media or transceiver |
+| `RCD-CBL-LENGTH-MISSING` | warning | A cable without `lengthM`: reach not checked | Add the length |
+| `RCD-CBL-MIXED` | error · warning | Multimode and single-mode, or different families, in one channel (error); different grades of one family, such as OM3 on OM4 (warning) | Use one media family per channel |
+| `RCD-CBL-SPEED` | error · warning | The media is not specified for the channel speed (Cat5e at 10G) | Higher-grade media |
+| `RCD-CBL-REACH` | error | The whole channel (cords + permanent links) is longer than the media reaches at that speed | Better media, optics, or a shorter path |
+| `RCD-CBL-CHANNEL` | error · warning | A copper permanent link over 90 m (error); cords in the channel over 10 m in total (warning) | Respect the 90 m + 10 m model |
+| `RCD-CBL-OPTIC` | warning | A 40G/100G multimode channel through LC duplex panels (parallel optics need MPO) | MPO panels and trunks, or duplex optics |
+
+<PromptRef id="cat6-10g" />
+
+## Labels
+
+| Code | Severity | What it catches | Typical fix |
+|---|---|---|---|
+| `RCD-LBL-MISSING` | warning | A cable without `label`; label sheets fall back to its id | Label it |
+| `RCD-LBL-DUP` | error | Two cables with the same label (case-insensitive, trimmed) | Renumber one |
+| `RCD-LBL-PATTERN` | warning · error | A label that does not match `policy.labelPattern` (warning); an invalid pattern (error) | Follow or fix the pattern |
+| `RCD-LBL-COLOR` | warning | A cable whose `color` differs from `policy.colorByFunction` for its `function` | Fix the color or the function |
+
+## See them all at once
+
+The [broken rack example](../../../examples/broken-rack/elevation.html) is built to trigger every family. Pick it in the interactive rack on the [home page](../../) to see which equipment each finding points at.

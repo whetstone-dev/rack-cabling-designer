@@ -1,0 +1,77 @@
+This walkthrough takes you from one request to a validated rack with its elevation, schedule and BOM. It assumes the skill is [installed](../installation/) and Node.js 22.18+ is available.
+
+<Steps>
+  <Step title="Describe the rack">
+    Open your assistant in a project folder and ask in plain language. Include the numbers you know; the skill fills the rest from its references and tells you what it assumed.
+
+    <PromptRef id="office-cabinet" />
+  </Step>
+
+  <Step title="Let it build the model">
+    The assistant writes a model such as `racks/office.rack.json` in your project (never inside the skill folder). It starts from `rackcab init` or one of the examples, and uses generic catalog types where you did not give a datasheet:
+
+    ```bash
+    node "<skill-dir>/scripts/rackcab.ts" init racks/office.rack.json
+    ```
+  </Step>
+
+  <Step title="Validate and fix">
+    The assistant runs every rule and fixes the model until there are no errors, explaining each fix in terms of the rule:
+
+    ```console
+    · info    RCD-AIR-BLANKING       Rack "R01" has 39 open unit(s) on the cold face (U1-U39); fit blanking panels to stop hot-air recirculation.
+
+    PASS: 0 error(s), 0 warning(s), 1 info · 1 rack(s), 3 device(s), 1 cable(s), 1 channel(s)
+    ```
+
+    Info findings are advice; warnings deserve a look; errors block the build.
+  </Step>
+
+  <Step title="Generate the deliverables">
+    With a passing model, `build` writes seven files:
+
+    ```bash
+    node "<skill-dir>/scripts/rackcab.ts" build racks/office.rack.json -o racks/office-docs
+    ```
+
+    ```tree
+    racks/office-docs/
+    ├── elevation.html        # front and rear views of every rack
+    ├── README.md             # design document
+    ├── cable-schedule.csv    # every cable by channel
+    ├── labels.csv            # two labels per cable
+    ├── bom.csv               # bill of materials
+    ├── power.md              # power budget
+    └── report.json           # findings and channels
+    ```
+  </Step>
+
+  <Step title="Review and iterate">
+    Open `elevation.html` in a browser and ask for changes in plain language. The assistant edits the model and rebuilds; it never patches generated files.
+
+    <Prompt>Move the router above the firewall, add a second cable manager under the switch and rebuild.</Prompt>
+  </Step>
+</Steps>
+
+## See it without installing anything
+
+The real outputs of the three examples that ship with the skill are on this site. The **broken rack** example breaks every rule family on purpose, so you can see what findings look like:
+
+| Example | Model | Elevation |
+|---|---|---|
+| Small office cabinet (24U) | [small-office.rack.json](../../../examples/small-office/small-office.rack.json) | [elevation.html](../../../examples/small-office/elevation.html) |
+| Data hall pod (2 × 42U) | [datacenter-pod.rack.json](../../../examples/datacenter-pod/datacenter-pod.rack.json) | [elevation.html](../../../examples/datacenter-pod/elevation.html) |
+| Broken rack (12U) | [broken-rack.rack.json](../../../examples/broken-rack/broken-rack.rack.json) | [elevation.html](../../../examples/broken-rack/elevation.html) |
+
+<Callout type="tip" title="Quick questions need no model">
+"What is the max length of Cat6 at 10G?" or "how many U is a 2U server plus a 1U manager?" are answered directly from the references, without creating any file.
+</Callout>
+
+## Next steps
+
+<Cards>
+  <Card href="../prompts/" title="Prompt library">More requests to copy and adapt.</Card>
+  <Card href="../writing-requests/" title="Writing good requests">What to include and what the skill assumes.</Card>
+  <Card href="../outputs/" title="Generated outputs">What each file contains.</Card>
+  <Card href="../rules/" title="Rule reference">Every finding explained.</Card>
+</Cards>

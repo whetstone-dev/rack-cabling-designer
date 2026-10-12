@@ -1,0 +1,45 @@
+**Rack & Cabling Designer** is an [Agent Skill](https://agentskills.io) that gives your AI assistant the know-how and the tools of an infrastructure designer. You describe a server room, a telecom closet or a data-hall row in plain language; the assistant turns it into a model, checks that model against engineering rules and generates the documents an installer needs.
+
+<PromptRef id="compute-rack" />
+
+## What you get
+
+- **A model** (`*.rack.json`) that describes racks, equipment, PDUs, power links and every cable. It has a JSON Schema, so your editor autocompletes it and typos are caught.
+- **Findings** from 38 rules: equipment that does not fit, a PDU that overloads when a feed fails, a switch breathing hot-aisle air, a 10G link over Cat5e, two cables with the same label. Each finding has a code, the numbers and the source of the limit.
+- **Deliverables** generated from the model: front and rear rack elevations, a cable schedule by channel, label sheets, a bill of materials, a power budget and a Markdown design or as-built document.
+
+## One model, every output
+
+Everything is regenerated from the model. To move a server, you change its `position` and rebuild; the elevation, the schedule, the labels and the BOM all follow. Nothing is patched by hand, so the documents never contradict each other.
+
+```text
+requirements → *.rack.json → rackcab validate → rackcab build → elevation · schedule · labels · BOM · power · README
+```
+
+## Who it is for
+
+- **Network and infrastructure engineers** designing closets, server rooms and data-center rows.
+- **Installers and integrators** who need schedules, labels and a BOM that match the drawings.
+- **IT teams** documenting what is already in the rack (as-built) or planning a change on a live rack.
+- **Students and instructors** learning rack layout, structured cabling and A/B power with real numbers.
+
+## How it works inside your assistant
+
+The skill is a folder with instructions (`SKILL.md`), nine reference guides and a zero-dependency toolkit called `rackcab`. When your request is about racks, cabling or rack power, the assistant loads the skill, follows its workflow and runs `rackcab` with Node.js. If Node.js is not available, it still answers from the references and tells you the rule checks did not run.
+
+<Callout type="note" title="It answers in your language">
+The references are in English, but you can ask in any language. The skill answers in yours and translates the terms.
+</Callout>
+
+## What it is not
+
+A passing validation means the **model** is consistent. It is not a site survey, a cabling certification or an electrical design. Read [Safety & limits](../safety-and-limits/) for what is out of scope.
+
+## Next steps
+
+<Cards>
+  <Card href="../installation/" title="Install the skill">Claude Code, Codex, Cursor or any Agent Skills app.</Card>
+  <Card href="../quickstart/" title="Quickstart">Your first validated rack in five minutes.</Card>
+  <Card href="../prompts/" title="Prompt library">Ready-to-copy requests for every task.</Card>
+  <Card href="../the-model/" title="The rack model">Every field of the *.rack.json file.</Card>
+</Cards>

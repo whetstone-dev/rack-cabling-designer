@@ -1,0 +1,44 @@
+The core is a standard [Agent Skills](https://agentskills.io/specification) folder: `SKILL.md` uses only the six spec fields, so the same files serve every platform. Only the install location and the way the skill is activated differ.
+
+**A platform is listed as verified only when the real assistant was seen activating the skill**, not when files were copied. Conventions were checked against official documentation on 2026-10-12.
+
+## Status
+
+| Assistant | Files and format | Toolkit from the installed copy | Activation in the real assistant |
+|---|---|---|---|
+| **Claude Code** | ✅ | ✅ | ✅ **Verified.** CLI: discovery, implicit activation and explicit `/rack-cabling-designer`, with a negative control. Desktop app: listed and invoked in a live session. |
+| **OpenAI Codex** | ✅ | ✅ | ⚠️ **Partial.** Discovered, and selected implicitly. Execution not confirmed yet (a Windows sandbox issue on the audit machine, then an account usage limit). |
+| **Cursor 2.4+** | ✅ | ✅ | ⏳ **Not verified yet.** Structural checks only. |
+| Other Agent Skills apps | ✅ | ✅ | Depends on the app (`--target <skills folder>`) |
+
+The evidence for each cell is in the repository's [audit report](https://github.com/whetstone-dev/rack-cabling-designer/blob/main/docs/audit/2026-10-12-audit.md).
+
+## Per platform
+
+| | Claude Code | OpenAI Codex | Cursor 2.4+ |
+|---|---|---|---|
+| User install | `~/.claude/skills` | `~/.agents/skills` | `~/.cursor/skills` (also reads `~/.agents`, `~/.claude`, `~/.codex`) |
+| Project install | `.claude/skills` | `.agents/skills` | `.cursor/skills` or `.agents/skills` |
+| Explicit invocation | `/rack-cabling-designer` | `$rack-cabling-designer` | `/rack-cabling-designer` |
+| Implicit invocation | By description | By description | By description |
+| Discovery after install | Live (`/reload-skills` if the folder did not exist) | Next turn; restart if missing | At startup; reload the window |
+| Running `rackcab` | Through the Bash tool, subject to permissions | Shell in the `workspace-write` sandbox; no network needed | Agent terminal, under the Run Mode |
+| Platform-specific files | none | `agents/openai.yaml` (UI metadata, ignored elsewhere) | none |
+
+All platforms need **Node.js 22.18+** on the PATH for the toolkit. Without it, the instructions and references still work and the assistant reports the rule checks as not executed.
+
+## Other surfaces
+
+| Surface | Status |
+|---|---|
+| claude.ai and the Claude API (zip upload) | Planned. The format is already compatible; whether Node.js is available in that environment is not verified. |
+| Claude Code plugin marketplace | Planned. The repository layout already matches the plugin layout. |
+| Copilot, Gemini CLI, OpenCode and other clients | Install with `--target <skills folder>` or `npx skills add`. Files, format and self-test are verified; activation depends on the client. |
+| Cursor before 2.4 | Not supported. |
+
+## Known limitations
+
+- **Duplicates.** Cursor also reads the Claude Code and Codex folders, so installing for several assistants can make one see two copies. The installer shares folders where it can, shows which assistant sees which copy, and warns. Keep copies on the same version.
+- **Codex legacy folder.** Copies in `~/.codex/skills` are still loaded and appear twice; `--verify` warns about them. The installer never writes there.
+- **Agent-driven installs in Codex.** Codex's sandbox protects `.agents/`, so asking Codex itself to run the installer into `.agents/skills` needs approval. Running the installer in your own terminal is unaffected.
+- **Outputs are files.** `elevation.html` opens in a browser on every platform; it is not rendered inline in the chat.

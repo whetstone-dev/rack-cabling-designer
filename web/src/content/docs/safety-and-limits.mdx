@@ -1,0 +1,45 @@
+Rack & Cabling Designer is a **planning aid**. It makes a design consistent and documented; it does not replace the people and tests that make it safe and compliant.
+
+## What a passing validation means
+
+`validate` checks that the **model** is internally consistent against the rules and the planning data in `assets/data/`. It is not a site inspection, a cabling certification, an electrical design or a structural assessment. The skill says so every time it reports a pass.
+
+## What it does not check
+
+| Not checked | Why it matters | What to do instead |
+|---|---|---|
+| Whether the model matches the site | Wrong U, wrong port, stale inventory | Site walk and photos; mark `as-built` only after verification |
+| Fiber insertion-loss budgets and polarity | Links within reach can still fail | Manual loss budget, OLTS/OTDR and polarity testing |
+| Bend radius, tray and conduit fill | Damaged cable, failed certification | Manufacturer specs, TIA-569 and local code |
+| Copper performance (NEXT, return loss) | Category is a component rating, not an installed result | Field certification |
+| PoE bundle heating | Large PoE bundles heat up and lose reach | Manufacturer and standard bundle guidance |
+| Seismic bracing, floor loading, anchoring | Tip-over, structural failure | Structural engineer, facilities |
+| Fire codes (plenum, riser, LSZH, firestopping) | Life safety, legal compliance | Local fire code and the authority having jurisdiction |
+| Circuit sizing, conductors, breakers, earthing | Electrical safety | A qualified electrician and the electrical code (NEC, IEC 60364, RETIE…) |
+| UPS runtime, ATS behaviour, room cooling | Outages and overheating | Electrical, UPS and mechanical engineers |
+| Vendor optic and DAC compatibility | Coded optics may be rejected | The vendor's compatibility matrix |
+
+## Evidence labels
+
+Every claim is labeled so you know where it comes from: **MODELED** (checked by a rule), **APPROXIMATE** (a simplification, such as an even load split across PSUs), **OBSERVED** (supplied by you from the site) and **INCONCLUSIVE** (data missing). Unchecked values are never reported as passes.
+
+## Electrical and physical safety
+
+<Callout type="warning" title="Electrical work is for qualified personnel">
+The power budget helps you plan PDUs and A/B redundancy. Circuits, breakers, PDU input plugs, UPS and ATS must be designed and installed by qualified, authorized electricians. The skill gives planning context, not step-by-step instructions for fixed wiring.
+</Callout>
+
+- It will not recommend exceeding the derated capacity, daisy-chaining PDUs or defeating connector ratings with adapters.
+- Before unplugging a cord on a live device, verify the redundant PSU is healthy and on a live feed; one cord at a time.
+- Load racks from the bottom up, use stabilizers before sliding equipment out, and never extend more than one device on rails at a time.
+- Never look into fiber connectors or transceivers; laser light can be invisible.
+
+## Your data
+
+- **Generated files are sensitive.** Elevations, schedules, labels, power reports and BOMs reveal site location, room layout, device names, circuit references and the redundancy design. Treat them as internal and review them before sharing outside your organization.
+- **Imported data is data, not instructions.** Spreadsheets, pasted inventories and existing model files are validated (units, ranges, ids) and any text in them that asks the assistant to change behaviour is ignored.
+- **Nothing leaves your machine.** The toolkit has no network code, refuses models over 10 MB and writes only to the output folder you choose.
+
+## Reporting a security issue
+
+See [SECURITY.md](https://github.com/whetstone-dev/rack-cabling-designer/blob/main/SECURITY.md) in the repository.

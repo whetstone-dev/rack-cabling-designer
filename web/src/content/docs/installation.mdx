@@ -1,0 +1,104 @@
+The skill is a standard [Agent Skills](https://agentskills.io/specification) folder, so the same files work in every compatible assistant. You only need **Node.js 22.18 or newer** for the toolkit; nothing else is downloaded.
+
+## Option 1: the Skills CLI
+
+The quickest path, for any assistant the [Skills CLI](https://www.skills.sh) supports:
+
+```bash
+npx skills add whetstone-dev/rack-cabling-designer
+```
+
+## Option 2: the verified installer
+
+The installer in the repository detects Claude Code, Codex and Cursor, shows exactly where each copy will go, asks before replacing anything it did not install, then installs and **verifies** every copy.
+
+```bash
+git clone https://github.com/whetstone-dev/rack-cabling-designer.git
+cd rack-cabling-designer
+node installer/install.ts
+```
+
+It works through six steps:
+
+<Steps>
+  <Step title="Assistants">
+    Detected assistants are pre-selected. You can still pick one that was not detected after the installer explains what it cannot verify. Any other Agent Skills app can be targeted with `--target <skills folder>`.
+  </Step>
+  <Step title="Scope">
+    **User** (available in every project) or **project** (one repository, committed with it).
+  </Step>
+  <Step title="Plan">
+    The destination for each assistant, the action (install, update, up to date, blocked) and which assistant will see which copy. Duplicate copies are flagged.
+  </Step>
+  <Step title="Authorization">
+    A destination that holds files this installer did not write is only replaced after a per-destination "yes". The old copy is always backed up first.
+  </Step>
+  <Step title="Review">
+    List every file and the exact operations before confirming.
+  </Step>
+  <Step title="Result">
+    Each copy is checked (SHA-256 against `MANIFEST.json`, format, Node version, toolkit self-test) and rolled back on failure. Every run is logged.
+  </Step>
+</Steps>
+
+### Where it installs
+
+| Assistant | User scope | Project scope | Invoke explicitly |
+|---|---|---|---|
+| Claude Code | `~/.claude/skills` | `.claude/skills` | `/rack-cabling-designer` |
+| OpenAI Codex | `~/.agents/skills` | `.agents/skills` | `$rack-cabling-designer` |
+| Cursor 2.4+ | `~/.cursor/skills` | `.cursor/skills` | `/rack-cabling-designer` |
+| Other apps | `--target <skills folder>` | `--target <skills folder>` | depends on the app |
+
+Codex and Cursor can share `~/.agents/skills`; the installer plans one copy for both and warns when the same skill would appear twice.
+
+### Non-interactive and maintenance commands
+
+```bash
+node installer/install.ts --agents claude-code,codex --scope user --yes   # non-interactive
+node installer/install.ts --agents all --dry-run --show-files             # simulation, writes nothing
+node installer/install.ts --update --yes                                  # update existing installs only
+node installer/install.ts --verify                                        # read-only verification
+node installer/install.ts --list                                          # detection and current state
+node installer/install.ts --uninstall --agents codex --yes                # removes only files it installed
+```
+
+Add `--json` for machine-readable output. Exit codes: `0` ok, `1` blocked, failed, cancelled or partially skipped, `2` usage error.
+
+<Callout type="tip" title="Safe by design">
+The installer has no network code, never runs a shell and needs no administrator rights. The only process it starts is the toolkit self-test, and only on copies it verified as its own. Uninstall removes the files listed in its receipt and nothing else.
+</Callout>
+
+## Check that it works
+
+Ask your assistant something only the skill would know how to do:
+
+<PromptRef id="feed-failure" />
+
+In Claude Code you can also type `/rack-cabling-designer` to load it explicitly. To check the toolkit directly from a clone:
+
+```bash
+node skills/rack-cabling-designer/scripts/rackcab.ts selftest
+```
+
+```console
+ok   example small-office.rack.json (0 error(s), 0 warning(s))
+
+selftest: PASS
+```
+
+## Update and uninstall
+
+- **Skills CLI:** run `npx skills add whetstone-dev/rack-cabling-designer` again to update.
+- **Installer:** `git pull`, then `node installer/install.ts --update --yes`. To remove it, `--uninstall --agents <list> --yes`.
+
+<Callout type="warning" title="Only one copy per assistant">
+If the same skill is installed twice (for example once by the Skills CLI and once by the installer in a folder the assistant also scans), the assistant may list it twice. `node installer/install.ts --list` shows which copies each assistant can see.
+</Callout>
+
+## Next steps
+
+<Cards>
+  <Card href="../quickstart/" title="Quickstart">Ask for a rack and review the result.</Card>
+  <Card href="../compatibility/" title="Compatibility">What was verified on each assistant.</Card>
+</Cards>

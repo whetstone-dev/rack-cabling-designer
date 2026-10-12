@@ -1,0 +1,110 @@
+`rackcab` is the toolkit the skill runs. It needs Node.js 22.18 or newer and nothing else: no packages, no network. You can use it without an assistant from a clone of the repository.
+
+```bash
+node skills/rack-cabling-designer/scripts/rackcab.ts <command> [options]
+```
+
+Inside an assistant, the skill resolves its own folder and quotes it: `node "<skill-dir>/scripts/rackcab.ts" <command>`. In Claude Code that folder is `${CLAUDE_SKILL_DIR}`.
+
+## Commands
+
+| Command | Purpose |
+|---|---|
+| `validate <model> [--strict] [--json]` | Schema plus every rule family: rack fit, airflow, power, cabling, labels |
+| `build <model> [-o dir] [--strict] [--allow-invalid]` | Writes all seven outputs, gated by validation |
+| `elevation <model> [-o file.html]` | Front and rear rack elevations (self-contained HTML) |
+| `schedule <model> [--format csv\|md] [-o file]` | Cable schedule by channel |
+| `labels <model> [-o file.csv]` | Two labels per cable, one per end |
+| `bom <model> [--format md\|csv] [-o file]` | Bill of materials |
+| `power <model> [-o file.md]` | Power budget with derating and feed-failure loads |
+| `trace <model> <device>:<port>[:rear]` | One channel end to end, through panels and outlets |
+| `init <file.rack.json> [--force]` | Starter model linked to the JSON Schema |
+| `catalog [--json]` | Generic equipment types usable as `type` |
+| `selftest` | Checks the installation against the bundled examples |
+| `version`, `help` | |
+
+## Options
+
+| Option | Effect |
+|---|---|
+| `--strict` | Warnings also fail the gate |
+| `--allow-invalid` | `build` writes outputs even when the gate fails, as drafts (still exits 1) |
+| `--json` | `validate` prints findings with their model paths, for example `cables[4].b.port` |
+| `-o` | Output folder (`build`) or file (single outputs) |
+
+## Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | OK |
+| `1` | Validation gate failed |
+| `2` | Usage or input error (missing file, invalid JSON, file over 10 MB) |
+| `3` | Internal error |
+
+## validate
+
+```bash
+node rackcab.ts validate examples/datacenter-pod.rack.json
+```
+
+```console
+· info    RCD-AIR-BLANKING       Rack "A01" has 34 open unit(s) on the cold face (U1-U9, U12-U19, U24-U40); fit blanking panels to stop hot-air recirculation.
+· info    RCD-AIR-BLANKING       Rack "A02" has 40 open unit(s) on the cold face (U1-U39, U41); fit blanking panels to stop hot-air recirculation.
+
+PASS: 0 error(s), 0 warning(s), 2 info · 2 rack(s), 11 device(s), 16 cable(s), 12 channel(s)
+```
+
+Errors always fail the gate; warnings fail it with `--strict`; info never does. Schema errors stop the domain rules, so fix them first.
+
+## build
+
+```bash
+node rackcab.ts build examples/broken-rack.rack.json -o broken-docs
+```
+
+```console
+✖ error   RCD-RACK-BOUNDS        "sC" occupies U13-U13 but rack "X1" has 12U.
+✖ error   RCD-RACK-OVERLAP       "sA" and "sB" collide in rack "X1" at U12-U12 (front).
+✖ error   RCD-PWR-CAPACITY       PDU "p1" normal load 2250 W (98%) exceeds the usable 1840 W (80% of 2300 W).
+✖ error   RCD-CBL-REACH          Channel x4 is 9 m; dac at 25G reaches 5 m (IEEE 802.3 Clause 110 (25GBASE-CR, 5 m with RS-FEC; 3 m for CR-S)).
+▲ warning RCD-PWR-REDUNDANCY     "sA": all inlets are on feed A; losing that feed drops the device. Spread inlets across feeds.
+
+Validation gate failed: 22 error(s), 13 warning(s), 1 info · 1 rack(s), 7 device(s), 10 cable(s), 8 channel(s).
+Fix the model, or pass --allow-invalid to write draft outputs.
+```
+
+(Output trimmed: the broken example raises 36 findings.) With `--allow-invalid` the same command writes the files marked as drafts and still exits `1`.
+
+## trace
+
+```bash
+node rackcab.ts trace examples/datacenter-pod.rack.json leaf1:Eth1/49
+```
+
+```console
+CH011 · 3 cable(s) · 19 m · 100G
+  1. DC1-0021 · os2 · 2 m · cord
+     A01 compute.U42:A01-LEAF-1:Eth1/49  →  A01 compute.U40:A01-FP:1
+  2. DC1-0022 · os2 · 15 m · permanent
+     A01 compute.U40:A01-FP:1(rear)  →  A02 network.U42:A02-FP:1(rear)
+  3. DC1-0023 · os2 · 2 m · cord
+     A02 network.U42:A02-FP:1  →  A02 network.U40:A02-SPINE-1:Eth1/1
+```
+
+Add `:rear` to start from the rear of a panel port, for example `fp1:1:rear`.
+
+## init and catalog
+
+```bash
+node rackcab.ts init site.rack.json
+```
+
+```console
+Created site.rack.json. Next: edit it, then run "validate site.rack.json".
+```
+
+The starter model has one 42U rack, a patch panel, a cable manager, a switch and a policy with A/B redundancy and a label pattern. Its `$schema` points to the bundled schema, so editors such as VS Code autocomplete every field. `catalog` lists the generic types you can use before datasheets exist.
+
+<Callout type="tip" title="Use it in CI">
+`validate --strict` exits `1` on any error or warning, so you can keep models in a repository and fail a pipeline when a change breaks a rule.
+</Callout>

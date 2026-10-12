@@ -1,0 +1,16 @@
+Copy a prompt, change the numbers and names to match your site, and paste it into your assistant. They work in any language: the skill answers in yours. Paths such as `racks/hq.rack.json` are examples; use your own model file.
+
+<Callout type="tip" title="Three kinds of prompts">
+**Quick answer** prompts get a reply from the references, with no files. **Edits a model** prompts create or change a `*.rack.json` file. **Full deliverables** prompts end with `rackcab build` and the files an installer needs.
+</Callout>
+
+<PromptLibrary />
+
+## Make any prompt better
+
+- **Give the numbers you know.** Distances, power in watts, depth in millimetres, rack height. The skill uses datasheet figures over catalog placeholders.
+- **Say what you want back.** "Give me the elevation and the BOM" ends the job with files; "explain" gets an answer.
+- **Name the model file** when one exists, so the skill edits it instead of starting over.
+- **Mention constraints**: "front faces the cold aisle", "A/B feeds", "our labels look like DC1-0001", "stock cords are 1, 2, 3 and 5 m".
+
+More guidance in [Writing good requests](../writing-requests/).

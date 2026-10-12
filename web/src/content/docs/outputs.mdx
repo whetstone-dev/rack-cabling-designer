@@ -1,0 +1,82 @@
+`rackcab build` writes seven files from the model. Every value is escaped for its format (HTML, Markdown, and CSV formula injection), and nothing is fetched from the network. The links below open the real outputs of the [data hall pod example](../../../examples/datacenter-pod/datacenter-pod.rack.json).
+
+| File | For | Content |
+|---|---|---|
+| [elevation.html](../../../examples/datacenter-pod/elevation.html) | Everyone | Front and rear views of every rack, with findings |
+| [README.md](../../../examples/datacenter-pod/README.md) | Design review, handover | The design or as-built document |
+| [cable-schedule.csv](../../../examples/datacenter-pod/cable-schedule.csv) | Installers | Every cable grouped by channel |
+| [labels.csv](../../../examples/datacenter-pod/labels.csv) | Label printer | Two labels per cable |
+| [bom.csv](../../../examples/datacenter-pod/bom.csv) | Procurement | Bill of materials |
+| [power.md](../../../examples/datacenter-pod/power.md) | Electrical review | Power budget and heat load |
+| [report.json](../../../examples/datacenter-pod/report.json) | Your tooling | Findings and channels |
+
+## elevation.html
+
+One self-contained file: inline CSS and SVG, **no scripts**, no network. It shows every rack from the front and the rear, with 0U PDUs on the side channels and full-depth equipment on both faces (dimmed and marked "rear" on the face where you see its back). Collisions are hatched, and the findings table is included. It follows the system light or dark theme and prints in landscape.
+
+## README.md
+
+The design document (or as-built, when `meta.status` is `as-built`): summary, findings, a U-by-U table per rack, the power budget, channels, the cable schedule, the BOM and the assumptions. It opens with a reminder that it is a planning aid.
+
+## cable-schedule.csv
+
+Every cable, grouped by end-to-end channel. Each end is written as `rack.U:device:port`, so a technician can find it without the drawing.
+
+```csv
+Channel,Cable,Label,A end,B end,Media,Length (m),Color,Function,Kind,Pathway,Status
+CH001,d01,DC1-0001,A01 compute.U23:SRV-01:nic1,A01 compute.U42:A01-LEAF-1:Eth1/1,dac,2,,data,cord,,planned
+CH002,d02,DC1-0002,A01 compute.U23:SRV-01:nic2,A01 compute.U41:A01-LEAF-2:Eth1/1,dac,2,,data,cord,,planned
+```
+
+## labels.csv
+
+Two labels per cable, one for each end. Line 1 is the label; line 2 says where the other end goes.
+
+```csv
+Cable,End,Line 1,Line 2,Attach at
+d01,A,DC1-0001,to A01 compute.U42:A01-LEAF-1:Eth1/1,A01 compute.U23:SRV-01:nic1
+d01,B,DC1-0001,to A01 compute.U23:SRV-01:nic1,A01 compute.U42:A01-LEAF-1:Eth1/1
+```
+
+## bom.csv
+
+Equipment by type, PDUs, cords rounded up to `policy.stockLengthsM`, bulk cable for permanent links with `policy.cableSlackPercent` of slack, transceivers by type, power cords and one blanking panel per open cold-face unit.
+
+```csv
+Group,Item,Qty,Unit,Notes
+Equipment,"Generic 1U rack server, 2x25G + 2x1G + BMC [generic-server-1u]",4,pcs,server
+Power distribution,"PDU 230 V 32 A 1-phase, 36xC13 + 6xC19, 0U-left",1,pcs,
+Cords,DAC 2 m,8,pcs,
+```
+
+## power.md
+
+Per PDU: rating, capacity, usable capacity after derating, normal load, the **worst failover load** and which feed failure causes it, and outlets used. Per rack: load and heat in BTU/h.
+
+| PDU | Feed | Rating | Usable W | Normal W | Worst failover W |
+|---|---|---|---|---|---|
+| A01-PDU-A | A | 230 V 32 A | 5888 | 2500 (34%) | 5000 (68%) if B fails |
+| A01-PDU-B | B | 230 V 32 A | 5888 | 2500 (34%) | 5000 (68%) if A fails |
+
+<Callout type="warning" title="Planning values">
+The power budget is not an electrical design. Circuits, breakers, conductors and UPS must be designed and installed by qualified personnel under the local electrical code.
+</Callout>
+
+## report.json
+
+The validation result for scripts and dashboards: `ok`, `counts`, every finding with its `code`, `severity`, `message` and model `path`, and the traced channels.
+
+```json
+{
+  "ok": true,
+  "counts": { "error": 0, "warning": 0, "info": 2 },
+  "diagnostics": [
+    { "code": "RCD-AIR-BLANKING", "severity": "info", "message": "Rack \"A01\" has 34 open unit(s) on the cold face …", "path": "racks[0]" }
+  ],
+  "channels": [{ "id": "CH011", "cables": ["f01", "f02", "f03"], "totalM": 19, "speed": "100G" }]
+}
+```
+
+## Sharing outputs
+
+Elevations, schedules and power reports reveal site layout, device names and circuit references. Review them before sharing outside your organization; the skill reminds you when it generates them.

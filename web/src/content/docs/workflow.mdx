@@ -1,0 +1,52 @@
+The skill plans physical infrastructure the way an installer will build it: **requirements → model → validation → drawings, schedules and documents**. These are the five steps it follows, and where your input matters.
+
+<Steps>
+  <Step title="Gather requirements">
+    Rooms, racks, the equipment list with datasheet figures, port counts, distances, power feeds, airflow layout and the labeling convention. The skill uses a site-survey template (`assets/templates/site-survey.md`) and records unknowns instead of inventing them.
+
+    <PromptRef id="site-survey" />
+  </Step>
+
+  <Step title="Model">
+    Everything goes into one `*.rack.json` file in your working directory, started with `rackcab init` or adapted from an example. Datasheet values are preferred over catalog placeholders, and assumptions are kept in `notes`. See [The rack model](../the-model/).
+  </Step>
+
+  <Step title="Validate and fix">
+    `rackcab validate` runs the schema and all six rule families. The skill fixes findings until there are no errors and explains each fix with the numbers, for example: *"PDU-A would carry 6.1 kW if feed B fails; its usable limit is 5.9 kW."*
+
+    ```bash
+    node "<skill-dir>/scripts/rackcab.ts" validate racks/hq.rack.json --strict
+    ```
+  </Step>
+
+  <Step title="Generate">
+    `rackcab build` writes the elevation, the design document, the cable schedule, labels, BOM, power budget and a JSON report. Review `elevation.html` together with the skill and iterate on the model, never on the outputs.
+  </Step>
+
+  <Step title="Hand over">
+    For a new build: the as-built package once the site is verified (`meta.status: "as-built"`). For work on live racks: a change plan from `assets/templates/change-plan.md`, with before/after states, the cables to move, power impact, rollback and a technician checklist.
+
+    <PromptRef id="as-built" />
+  </Step>
+</Steps>
+
+## How findings are labeled
+
+The skill labels every claim so you know how much to trust it:
+
+| Label | Meaning | Example |
+|---|---|---|
+| **MODELED** | A rule checked it against the model and the data files | "Channel CH003 is 96 m; Cat6A at 10G reaches 100 m." |
+| **APPROXIMATE** | A simplification was used | "Failover load assumes an even split across PSUs." |
+| **OBSERVED** | You supplied it from the site, a meter, a tester or a photo | "PDU-A reads 9.8 A (metered)." |
+| **INCONCLUSIVE** | Data is missing, so the check could not run | "Rack weight: 3 items have no weight." |
+
+## Where the numbers come from
+
+Reach per media and speed, derating, connector pairing and other limits live in `assets/data/*.json`, each with its source (IEEE 802.3 clause, ANSI/TIA-568, ISO/IEC 11801, common practice). They are planning values: confirm them against the standard in force, the datasheets and your local electrical code.
+
+## Quick questions skip the workflow
+
+Questions such as "how many U do I need for…" or "2-post or 4-post for this server?" are answered from the nine reference guides (racks, structured cabling, media, power, airflow, labeling, documentation, model, safety) without creating a model.
+
+<PromptRef id="two-post" />

@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+# Generated from the skill's examples on every dev/build (scripts/build-examples.ts)
+public/examples/
+public/schemas/
+src/generated/
+public/og.png

@@ -1,0 +1,56 @@
+You do not need a special syntax. The skill activates when your request is about racks, structured cabling or rack power, and it asks for what is missing. A few habits make the first answer much closer to what you need.
+
+## Include what an installer would ask
+
+| Topic | Useful details | Example |
+|---|---|---|
+| Racks | Height in U, depth, 2-post or 4-post, rated load, which aisle the front faces | "42U, 1200 mm deep, 4-post, front to the cold aisle" |
+| Equipment | Model or category, height, depth, weight, power (typical and max), PSU count and connectors, ports | "2U server, 750 mm, 28 kg, 1100 W max, two C14 inlets, 2×25G" |
+| Power | Feeds (A/B), voltage, circuit rating, phases, PDU outlets | "A/B 32 A single-phase at 230 V, 36×C13 + 6×C19" |
+| Cabling | Media, lengths, panels in the path, speed | "OS2 trunk of 15 m between LC panels, 100G" |
+| Conventions | Label format, color by function, stock cord lengths | "labels DC1-0001, uplinks yellow, cords 1/2/3/5 m" |
+| Deliverables | What you want back | "the elevation, the cable schedule and the BOM" |
+
+<PromptRef id="compute-rack" />
+
+## What the skill does with missing data
+
+- **It does not invent datasheet values.** It uses generic catalog types (for example `generic-server-1u`) as placeholders and says so, or asks you.
+- **It marks gaps as INCONCLUSIVE.** A rack without a `maxLoadKg`, a device without weight or a cable without length is reported as "not checked", never as a pass.
+- **It records assumptions** in the model's `notes`, so they travel with the design.
+
+## Ask for the right depth
+
+| You want | Ask like this |
+|---|---|
+| A quick answer | "Is 10GBASE-T OK over 60 m of Cat6?" |
+| A check of an existing model | "Validate `racks/hq.rack.json` with --strict and explain every finding." |
+| A change | "Add a 2U storage array to rack A01 and keep A/B redundancy." |
+| Full deliverables | "…and give me the elevation, the cable schedule, labels and the BOM." |
+
+<PromptRef id="cat6-10g" />
+
+## Work with existing files
+
+- **Inventories and spreadsheets:** paste them or point to the file. The skill treats their content as data, not instructions, and checks units (inches vs mm, lb vs kg, VA vs W).
+- **Photos of a rack:** values read from a photo are OBSERVED at best; the skill lists what it could not read and what to measure.
+- **A model from someone else:** ask for a review "as if you were the installer" to get findings ranked by risk.
+
+<PromptRef id="review-design" />
+
+## Change live racks safely
+
+For work on production racks, ask for a change plan. It covers before/after elevations, the cables to move with their labels, the power impact and rollback steps.
+
+<PromptRef id="change-plan" />
+
+## Invoke it explicitly
+
+If your assistant does not pick the skill up on its own, invoke it by name: `/rack-cabling-designer` in Claude Code and Cursor, `$rack-cabling-designer` in Codex.
+
+## Next steps
+
+<Cards>
+  <Card href="../prompts/" title="Prompt library">Every prompt in one place, filterable by task.</Card>
+  <Card href="../workflow/" title="The design workflow">What happens between your request and the files.</Card>
+</Cards>

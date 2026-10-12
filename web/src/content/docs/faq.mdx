@@ -1,0 +1,47 @@
+## Do I need to learn the model format?
+
+No. You describe what you need and the assistant writes and edits the model. Knowing [the model](../the-model/) helps when you want to review it or keep it in version control, and the JSON Schema gives you autocomplete in your editor.
+
+## Does it work without Node.js?
+
+Partly. The instructions and the nine reference guides still work, so the assistant can answer questions and reason about a design. The rule checks and the generated files need Node.js 22.18 or newer; without it, the assistant tells you the checks did not run.
+
+## Does it send my data anywhere?
+
+No. The toolkit and the installer have no network code. Your assistant itself may send the conversation to its provider, as with any request.
+
+## Can I use real vendor equipment?
+
+Yes. Define an equipment type with the datasheet values (height, depth, weight, power, inlets, ports, airflow) in `equipmentTypes`, or ask the assistant to do it from the datasheet. The generic catalog types are placeholders for early design.
+
+<PromptRef id="from-inventory" />
+
+## Which standards are the limits based on?
+
+Reach per media and speed, the copper channel model, derating and connector pairing come from IEEE 802.3, ANSI/TIA-568, ISO/IEC 11801 and common practice. Each value lives in `assets/data/` with its source, and findings quote it. Treat them as planning values and confirm against the standard in force.
+
+## Does it handle three-phase power?
+
+Yes. Set `phases: 3` on a PDU; capacity is √3 × V × A with line-to-line voltage. Load balancing across phases is not modeled.
+
+## Can it model breakout cables?
+
+Not as one cable. Model one cable per lane group (for example four 25G cables from `Eth1/49/1` to `Eth1/49/4`) and note the single physical breakout assembly.
+
+## Can I document an existing rack, not just design a new one?
+
+Yes. Mark devices with `status: "existing"`, set `meta.status` to `as-built` once verified on site, and use a change plan for work on live racks. Devices marked `remove` keep their units, weight and power until the change is done.
+
+<PromptRef id="audit-photo" />
+
+## Does it work with the network-engineering skill?
+
+They are complementary: [network-engineering](https://whetstone-dev.github.io/network-engineering/) designs the logical network (VLANs, routing, Cisco configs); this skill designs where the equipment goes and how it is cabled and powered. A device's `netRef` field can point to the matching device in a network model.
+
+## How do I report a bug or ask for a feature?
+
+Open an issue on [GitHub](https://github.com/whetstone-dev/rack-cabling-designer/issues). For a new rule, include the standard or source for the limit; normative values belong in `assets/data/` with their source.
+
+## Who makes it?
+
+It is part of [whetstone-dev](https://whetstone-dev.github.io/), an open-source lab building skills and guides for AI assistants. MIT licensed.
