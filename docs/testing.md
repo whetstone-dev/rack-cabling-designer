@@ -24,8 +24,10 @@
   - Cursor: **not run**, because no CLI is on PATH.
   - Full matrix and evidence: [audit/2026-10-12-audit.md](audit/2026-10-12-audit.md).
 - Structural and local functional audit: `node tools/audit.ts` covers 7 targets (3 platforms × 2 scopes + custom) with 93 checks, all passing. Report: [audit/2026-10-12-structural.md](audit/2026-10-12-structural.md).
-- Not run: `skills-ref validate` (the official reference validator). It is installable only from source; `tools/lint-skill.ts` enforces the same rules and CI has an informational job that runs it.
-- CI matrix (Ubuntu, Windows, macOS × Node 22, 24) is defined in `.github/workflows/ci.yml`; it runs when the repository is pushed.
+- CI ([run 38312714208](https://github.com/whetstone-dev/rack-cabling-designer/actions/runs/38312714208)): 7/7 jobs green.
+  - Ubuntu, macOS and Windows × Node 22 and 24, 69 tests per leg.
+  - The real `chmod` permission test passed on Linux and macOS, and is skipped on Windows as designed.
+  - The official `skills-ref validate` printed `Valid skill: skills/rack-cabling-designer`.
 
 ## Manual checklist for Cursor (and any platform without a CLI)
 
