@@ -130,8 +130,8 @@ export const en: Dictionary = {
     compatTitle: 'Where it runs',
     compat: [
       { name: 'Claude Code', status: 'verified', label: 'Verified', note: 'Discovery, implicit and explicit activation seen in the real CLI and desktop app.' },
-      { name: 'OpenAI Codex', status: 'partial', label: 'Partial', note: 'Discovered and selected implicitly; execution not confirmed yet.' },
-      { name: 'Cursor 2.4+', status: 'pending', label: 'Not verified yet', note: 'Installs and passes the structural checks; activation not observed yet.' },
+      { name: 'OpenAI Codex', status: 'verified', label: 'Verified', note: 'Discovery, implicit and explicit activation seen in the real assistant.' },
+      { name: 'Cursor 2.4+', status: 'verified', label: 'Verified', note: 'Discovery, implicit and explicit activation seen in the real editor.' },
     ],
     reqs: ['Node.js ≥ 22.18', 'Zero dependencies', 'Windows · macOS · Linux', 'MIT'],
   },

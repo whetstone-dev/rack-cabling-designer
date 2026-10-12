@@ -7,11 +7,11 @@ The core is a standard [Agent Skills](https://agentskills.io/specification) fold
 | Assistant | Files and format | Toolkit from the installed copy | Activation in the real assistant |
 |---|---|---|---|
 | **Claude Code** | ✅ | ✅ | ✅ **Verified.** CLI: discovery, implicit activation and explicit `/rack-cabling-designer`, with a negative control. Desktop app: listed and invoked in a live session. |
-| **OpenAI Codex** | ✅ | ✅ | ⚠️ **Partial.** Discovered, and selected implicitly. Execution not confirmed yet (a Windows sandbox issue on the audit machine, then an account usage limit). |
-| **Cursor 2.4+** | ✅ | ✅ | ⏳ **Not verified yet.** Structural checks only. |
+| **OpenAI Codex** | ✅ | ✅ | ✅ **Verified.** Discovery, implicit activation and explicit `$rack-cabling-designer` in the real assistant. |
+| **Cursor 2.4+** | ✅ | ✅ | ✅ **Verified.** Discovery, implicit activation and explicit `/rack-cabling-designer` in the real editor. |
 | Other Agent Skills apps | ✅ | ✅ | Depends on the app (`--target <skills folder>`) |
 
-The evidence for each cell is in the repository's [audit report](https://github.com/whetstone-dev/rack-cabling-designer/blob/main/docs/audit/2026-10-12-audit.md).
+The automated evidence is in the repository's [audit report](https://github.com/whetstone-dev/rack-cabling-designer/blob/main/docs/audit/2026-10-12-audit.md).
 
 ## Per platform
 

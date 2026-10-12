@@ -130,8 +130,8 @@ export const es: Dictionary = {
     compatTitle: 'Dónde funciona',
     compat: [
       { name: 'Claude Code', status: 'verified', label: 'Verificado', note: 'Descubrimiento y activación implícita y explícita observados en el CLI y la app de escritorio.' },
-      { name: 'OpenAI Codex', status: 'partial', label: 'Parcial', note: 'Se descubre y se selecciona sola; la ejecución aún no está confirmada.' },
-      { name: 'Cursor 2.4+', status: 'pending', label: 'Sin verificar', note: 'Se instala y pasa los chequeos estructurales; la activación aún no se ha observado.' },
+      { name: 'OpenAI Codex', status: 'verified', label: 'Verificado', note: 'Descubrimiento y activación implícita y explícita observados en el asistente real.' },
+      { name: 'Cursor 2.4+', status: 'verified', label: 'Verificado', note: 'Descubrimiento y activación implícita y explícita observados en el editor real.' },
     ],
     reqs: ['Node.js ≥ 22.18', 'Cero dependencias', 'Windows · macOS · Linux', 'MIT'],
   },
